@@ -3,6 +3,7 @@ import { LEVEL_DEFINITIONS } from '../data/gameData';
 import { SectionId, GameMode, UserSavedData } from '../types/game';
 import { PixelSprite } from './common/PixelSprite';
 import { soundManager } from '../utils/sound';
+import overworldMapImg from '../assets/images/stardew_valley_overworld_1793505142785.jpg';
 
 interface AdventureMapProps {
   userData: UserSavedData;
@@ -97,10 +98,13 @@ export const AdventureMap: React.FC<AdventureMapProps> = ({
           <div className="relative aspect-[16/9] w-full overflow-hidden border-2 border-[#331c07] bg-[#53733e]">
             {/* Real Pixel Art Valley Map */}
             <img
-              src="/src/assets/images/stardew_valley_overworld_1793505142785.jpg"
+              src={overworldMapImg}
               alt="Stardew Valley Adventure Map"
               className="w-full h-full object-cover select-none"
-              referrerPolicy="no-referrer"
+              onError={(e) => {
+                // Fallback to static public path if ever needed
+                (e.target as HTMLImageElement).src = '/assets/images/stardew_valley_overworld_1793505142785.jpg';
+              }}
             />
 
             {/* Location Hotspot Pins */}

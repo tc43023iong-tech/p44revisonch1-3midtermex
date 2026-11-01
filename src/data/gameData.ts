@@ -1,5 +1,14 @@
 import { LevelInfo, SectionId, FarmDecoration } from '../types/game';
 
+// Image assets imported as ES modules for production bundling (Vercel, Cloud Run, etc.)
+import imgVerbFarm from '../assets/images/pixel_verb_farm_1793505163424.jpg';
+import imgAdviceVillage from '../assets/images/pixel_advice_village_1793505143461.jpg';
+import imgFashionBoutique from '../assets/images/pixel_fashion_boutique_1793505162590.jpg';
+import imgGrammarWorkshop from '../assets/images/pixel_grammar_workshop_1793505163524.jpg';
+import imgMagicForest from '../assets/images/pixel_magic_forest_1793505143610.jpg';
+import imgTreasureMine from '../assets/images/pixel_treasure_mine_1793505144718.jpg';
+import imgFoxCottage from '../assets/images/pixel_fox_cottage_1793505144532.jpg';
+
 export const LEVEL_DEFINITIONS: Record<SectionId, LevelInfo> = {
   A: {
     id: 'A',
@@ -7,7 +16,7 @@ export const LEVEL_DEFINITIONS: Record<SectionId, LevelInfo> = {
     name: 'Verb Transformation Farm',
     subtitle: 'The Magical Verb Harvest',
     instruction: 'Complete the verb table by filling in the Past Form, Past Participle and Present Participle (-ing).',
-    bgImage: '/src/assets/images/pixel_verb_farm_1793505163424.jpg',
+    bgImage: imgVerbFarm,
     character: {
       name: 'Farmer Marnie',
       role: 'Ranch Caretaker',
@@ -22,7 +31,7 @@ export const LEVEL_DEFINITIONS: Record<SectionId, LevelInfo> = {
     name: 'Vocabulary Feast',
     subtitle: 'Chapter 3 Vocabulary in Context',
     instruction: 'Fill in the blanks with the correct Chapter 3 vocabulary words.',
-    bgImage: '/src/assets/images/pixel_advice_village_1793505143461.jpg',
+    bgImage: imgAdviceVillage,
     character: {
       name: 'Elder Lewis',
       role: 'Town Mayor',
@@ -37,7 +46,7 @@ export const LEVEL_DEFINITIONS: Record<SectionId, LevelInfo> = {
     name: 'Quantifiers Picnic',
     subtitle: 'Picnic Basket Matching',
     instruction: 'Match each quantifier with the correct food or drink item.',
-    bgImage: '/src/assets/images/pixel_fashion_boutique_1793505162590.jpg',
+    bgImage: imgFashionBoutique,
     character: {
       name: 'Emily',
       role: 'Valley Tailor',
@@ -52,7 +61,7 @@ export const LEVEL_DEFINITIONS: Record<SectionId, LevelInfo> = {
     name: 'Subject-Verb Agreement Challenge',
     subtitle: 'Grammar Harmony Workshop',
     instruction: 'Write the correct letter (A or B) in the blank to maintain subject-verb agreement.',
-    bgImage: '/src/assets/images/pixel_grammar_workshop_1793505163524.jpg',
+    bgImage: imgGrammarWorkshop,
     character: {
       name: 'Robin',
       role: 'Master Builder',
@@ -67,7 +76,7 @@ export const LEVEL_DEFINITIONS: Record<SectionId, LevelInfo> = {
     name: 'Comparative Word Correction',
     subtitle: 'Fix the Grammar Blueprint',
     instruction: 'Identify the incorrect word in each sentence and type the correct word.',
-    bgImage: '/src/assets/images/pixel_magic_forest_1793505143610.jpg',
+    bgImage: imgMagicForest,
     character: {
       name: 'Sylva',
       role: 'Forest Guardian',
@@ -82,7 +91,7 @@ export const LEVEL_DEFINITIONS: Record<SectionId, LevelInfo> = {
     name: 'Conjunction Connections',
     subtitle: 'Bridging Words Together',
     instruction: 'Fill in the blanks with: and / or / but / both / either / too.',
-    bgImage: '/src/assets/images/pixel_treasure_mine_1793505144718.jpg',
+    bgImage: imgTreasureMine,
     character: {
       name: 'Marlon',
       role: 'Cave Explorer',
@@ -97,7 +106,7 @@ export const LEVEL_DEFINITIONS: Record<SectionId, LevelInfo> = {
     name: 'Valley Food Reviews',
     subtitle: 'Comparatives & Superlatives',
     instruction: 'Complete the sentences using the correct comparative or superlative form of the words in brackets.',
-    bgImage: '/src/assets/images/pixel_fox_cottage_1793505144532.jpg',
+    bgImage: imgFoxCottage,
     character: {
       name: 'Penny',
       role: 'Village Librarian',
@@ -112,7 +121,7 @@ export const LEVEL_DEFINITIONS: Record<SectionId, LevelInfo> = {
     name: 'Class 4B Activity Survey',
     subtitle: 'Interpreting Survey Data',
     instruction: 'Look at the survey chart of Class 4B after-school activities and complete the report sentences.',
-    bgImage: '/src/assets/images/pixel_fox_cottage_1793505144532.jpg',
+    bgImage: imgFoxCottage,
     character: {
       name: 'Professor Fox',
       role: 'School Survey Leader',
