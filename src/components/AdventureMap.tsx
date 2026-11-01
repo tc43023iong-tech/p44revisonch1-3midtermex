@@ -61,7 +61,7 @@ export const AdventureMap: React.FC<AdventureMapProps> = ({
               Stardew Valley English Adventure
             </h1>
             <p className="text-xs sm:text-sm text-[#7c4f24] font-semibold mt-0.5">
-              Primary 5 English Grammar & Vocabulary Journey
+              Primary 4 English Grammar & Vocabulary Journey
             </p>
           </div>
         </div>
@@ -289,7 +289,7 @@ export const AdventureMap: React.FC<AdventureMapProps> = ({
       <div className="pixel-wood-dark p-3">
         <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#855328]">
           <span className="font-bold text-xs text-[#fed7aa]">
-            All Learning Locations (Primary 5 Curriculum)
+            All Learning Locations (Primary 4 Curriculum)
           </span>
           <span className="text-xs text-[#fed7aa]">8 Adventure Quests</span>
         </div>

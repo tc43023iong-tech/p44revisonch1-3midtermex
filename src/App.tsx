@@ -152,7 +152,7 @@ export default function App() {
             <PixelSprite name="sunflower" size={20} />
           </div>
           <span className="font-pixel text-xs sm:text-sm text-[#ffebb3] tracking-wider whitespace-nowrap">
-            Stardew English P5
+            Stardew English P4
           </span>
         </button>
 
@@ -273,7 +273,7 @@ export default function App() {
       {/* Footer */}
       <footer className="w-full bg-[#1b281c] border-t-2 border-[#121c13] py-3 px-4 text-center text-xs text-[#a3b899] z-20">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
-          <span>Stardew Valley English Adventure · Primary 5 Curriculum</span>
+          <span>Stardew Valley English Adventure · Primary 4 Curriculum</span>
           <span>Sections A, B, E, F, G, H, I, K · Single & Synchronous 2-Player Split Screen PK</span>
         </div>
       </footer>
