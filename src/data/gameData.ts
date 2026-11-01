@@ -4,587 +4,822 @@ export const LEVEL_DEFINITIONS: Record<SectionId, LevelInfo> = {
   A: {
     id: 'A',
     sectionCode: 'Section A',
-    name: 'Advice Village',
-    subtitle: 'Choose the Best Advice!',
-    instruction: 'Read the situation and choose the most suitable advice from the village elders.',
-    bgImage: '/src/assets/images/pixel_advice_village_1793505143461.jpg',
-    character: {
-      name: 'Elder Lewis',
-      role: 'Village Mayor',
-      avatarType: 'mayor',
-      greeting: 'Welcome to Advice Village, young farmer! Good citizens always offer wise, caring advice to their neighbours.'
-    },
-    totalQuestions: 5,
-  },
-  B: {
-    id: 'B',
-    sectionCode: 'Section B',
-    name: 'Grammar Workshop',
-    subtitle: 'Find the Mistake!',
-    instruction: 'Each sentence has ONE mistake. Type the correct word to fix the woodworking blueprint.',
-    bgImage: '/src/assets/images/pixel_grammar_workshop_1793505163524.jpg',
-    character: {
-      name: 'Robin',
-      role: 'Master Carpenter',
-      avatarType: 'craftsman',
-      greeting: 'Look at these blueprints! Some words are bent out of shape. Help me forge the correct grammar!'
-    },
-    totalQuestions: 5,
-  },
-  D: {
-    id: 'D',
-    sectionCode: 'Section D',
-    name: "Who's Forest",
-    subtitle: 'The Magical WHO Forest',
-    instruction: 'Combine the two sentences into ONE complete sentence using the relative pronoun WHO.',
-    bgImage: '/src/assets/images/pixel_magic_forest_1793505143610.jpg',
-    character: {
-      name: 'Sylva',
-      role: 'Forest Guardian',
-      avatarType: 'forest_nymph',
-      greeting: 'The ancient trees whisper in fragments! Connect their thoughts together using the magical word WHO.'
-    },
-    totalQuestions: 3,
-  },
-  E: {
-    id: 'E',
-    sectionCode: 'Section E',
-    name: 'Fashion Boutique',
-    subtitle: 'IN or WITH?',
-    instruction: 'Choose IN or WITH to complete each sentence.',
-    bgImage: '/src/assets/images/pixel_fashion_boutique_1793505162590.jpg',
-    character: {
-      name: 'Emily',
-      role: 'Master Tailor',
-      avatarType: 'fashion_rabbit',
-      greeting: 'Welcome to my boutique! Dressing with style requires the right preposition—IN or WITH?'
-    },
-    grammarTip: {
-      title: 'Grammar Rule: IN vs. WITH',
-      rule: 'IN = clothing items (e.g., She is in a red dress).\nWITH = physical features, accessories or things someone has or uses (e.g., The girl with glasses).',
-      example: 'Example: The boy IN the warm jacket WITH the shiny watch.'
-    },
-    totalQuestions: 8,
-  },
-  G: {
-    id: 'G',
-    sectionCode: 'Section G',
     name: 'Verb Transformation Farm',
-    subtitle: 'The Magical Verb Farm',
-    instruction: 'Complete the verb table by filling in the Past, Past Participle and Present Participle.',
+    subtitle: 'The Magical Verb Harvest',
+    instruction: 'Complete the verb table by filling in the Past Form, Past Participle and Present Participle (-ing).',
     bgImage: '/src/assets/images/pixel_verb_farm_1793505163424.jpg',
     character: {
       name: 'Farmer Marnie',
       role: 'Ranch Caretaker',
       avatarType: 'farmer',
-      greeting: 'Our crops grow as verbs transform! Harvest the correct past and participle forms.'
+      greeting: 'Welcome to the Verb Farm! Transform the verbs across all tenses to harvest bumper crops.'
     },
     totalQuestions: 8,
+  },
+  B: {
+    id: 'B',
+    sectionCode: 'Section B',
+    name: 'Vocabulary Feast',
+    subtitle: 'Chapter 3 Vocabulary in Context',
+    instruction: 'Fill in the blanks with the correct Chapter 3 vocabulary words.',
+    bgImage: '/src/assets/images/pixel_advice_village_1793505143461.jpg',
+    character: {
+      name: 'Elder Lewis',
+      role: 'Town Mayor',
+      avatarType: 'mayor',
+      greeting: 'Our valley feast needs the right descriptive words! Choose the best vocabulary word for each sentence.'
+    },
+    totalQuestions: 6,
+  },
+  E: {
+    id: 'E',
+    sectionCode: 'Section E',
+    name: 'Quantifiers Picnic',
+    subtitle: 'Picnic Basket Matching',
+    instruction: 'Match each quantifier with the correct food or drink item.',
+    bgImage: '/src/assets/images/pixel_fashion_boutique_1793505162590.jpg',
+    character: {
+      name: 'Emily',
+      role: 'Valley Tailor',
+      avatarType: 'fashion_rabbit',
+      greeting: 'We are packing tasty treats for the valley picnic! Match each container or measure with the right food.'
+    },
+    totalQuestions: 5,
+  },
+  F: {
+    id: 'F',
+    sectionCode: 'Section F',
+    name: 'Subject-Verb Agreement Challenge',
+    subtitle: 'Grammar Harmony Workshop',
+    instruction: 'Write the correct letter (A or B) in the blank to maintain subject-verb agreement.',
+    bgImage: '/src/assets/images/pixel_grammar_workshop_1793505163524.jpg',
+    character: {
+      name: 'Robin',
+      role: 'Master Builder',
+      avatarType: 'craftsman',
+      greeting: 'Subject and verb must fit together tightly like good timber! Pick the correct verb form for each subject.'
+    },
+    totalQuestions: 10,
+  },
+  G: {
+    id: 'G',
+    sectionCode: 'Section G',
+    name: 'Comparative Word Correction',
+    subtitle: 'Fix the Grammar Blueprint',
+    instruction: 'Identify the incorrect word in each sentence and type the correct word.',
+    bgImage: '/src/assets/images/pixel_magic_forest_1793505143610.jpg',
+    character: {
+      name: 'Sylva',
+      role: 'Forest Guardian',
+      avatarType: 'forest_nymph',
+      greeting: 'Look closely at these comparative sentences! One word is incorrect in each sentence. Correct it!'
+    },
+    totalQuestions: 5,
   },
   H: {
     id: 'H',
     sectionCode: 'Section H',
-    name: 'Vocabulary Treasure Mine',
-    subtitle: 'The Six Hidden Treasures',
-    instruction: 'Use each word ONLY ONCE to complete the sentences and unlock the crystal chests.',
+    name: 'Conjunction Connections',
+    subtitle: 'Bridging Words Together',
+    instruction: 'Fill in the blanks with: and / or / but / both / either / too.',
     bgImage: '/src/assets/images/pixel_treasure_mine_1793505144718.jpg',
     character: {
       name: 'Marlon',
-      role: 'Cave Miner',
+      role: 'Cave Explorer',
       avatarType: 'miner',
-      greeting: 'Six precious gems are locked deep in the cavern! Slot each vocabulary key into its rightful lock.'
+      greeting: 'Conjunctions build sturdy bridges between ideas. Slot the rightful connecting words into each sentence.'
     },
-    totalQuestions: 6,
+    totalQuestions: 10,
   },
   I: {
     id: 'I',
     sectionCode: 'Section I',
-    name: 'Translation Library',
-    subtitle: 'The Magical Translation Library',
-    instruction: 'Translate English into Chinese and Chinese into English using accurate vocabulary.',
+    name: 'Valley Food Reviews',
+    subtitle: 'Comparatives & Superlatives',
+    instruction: 'Complete the sentences using the correct comparative or superlative form of the words in brackets.',
     bgImage: '/src/assets/images/pixel_fox_cottage_1793505144532.jpg',
     character: {
       name: 'Penny',
       role: 'Village Librarian',
       avatarType: 'librarian',
-      greeting: 'Welcome to our ancient archive! Bilingual scholars can bridge the two languages with ease.'
+      greeting: 'The town food critic is reviewing local eateries! Complete each sentence using the word in brackets.'
     },
-    totalQuestions: 4,
+    totalQuestions: 5,
   },
   K: {
     id: 'K',
     sectionCode: 'Section K',
-    name: 'Fox Family Cottage',
-    subtitle: "The Little Foxes' Secret Mission",
-    instruction: 'Complete the dialogue using SHOULD, SHOULDN’T and the correct adverb/verb form of words in brackets.',
+    name: 'Class 4B Activity Survey',
+    subtitle: 'Interpreting Survey Data',
+    instruction: 'Look at the survey chart of Class 4B after-school activities and complete the report sentences.',
     bgImage: '/src/assets/images/pixel_fox_cottage_1793505144532.jpg',
     character: {
-      name: 'Rusty & Pip',
-      role: 'Fox Siblings',
+      name: 'Professor Fox',
+      role: 'School Survey Leader',
       avatarType: 'foxes',
-      greeting: 'Shh! We are tidying the cottage quietly so we do not wake Mother Fox!'
+      greeting: 'Here is the data on what pupils like doing after school! Study the chart numbers and complete the report.'
     },
-    totalQuestions: 7,
+    totalQuestions: 5,
   },
 };
 
-// Section A Questions
-export const SECTION_A_DATA = {
-  options: [
-    { key: 'A', text: 'You should discuss your idea with him.' },
-    { key: 'B', text: 'We shouldn’t make fun of others.' },
-    { key: 'C', text: 'You should not lie to her.' },
-    { key: 'D', text: 'You should take care of him.' },
-    { key: 'E', text: 'You should share your toys with her.' },
-    { key: 'F', text: 'You should be nice to others.' },
-  ],
-  questions: [
-    {
-      id: 1,
-      situation: 'I broke Grandma’s cup, but I told her that the dog did it.',
-      correctKey: 'C',
-      explanation: 'Telling someone a false story is lying. You should be honest and not lie to her.',
-    },
-    {
-      id: 2,
-      situation: 'My teammate and I have different ideas, and I feel angry.',
-      correctKey: 'A',
-      explanation: 'When working together, it is important to communicate calmly and discuss your ideas.',
-    },
-    {
-      id: 3,
-      situation: 'My cousin is crying because I won’t let her play with my toy cars.',
-      correctKey: 'E',
-      explanation: 'Sharing toys with family brings joy and stops quarrels.',
-    },
-    {
-      id: 4,
-      situation: 'A new pupil answered a question incorrectly, and some children laughed.',
-      correctKey: 'B',
-      explanation: 'Everyone makes mistakes when learning. We shouldn’t tease or make fun of classmates.',
-    },
-    {
-      id: 5,
-      situation: 'My little brother is sick.',
-      correctKey: 'D',
-      explanation: 'When a family member is unwell, we should look after them and take care of them.',
-    },
-  ],
-};
+// ==================== SECTION A DATA (Verb Table: 8 verbs) ====================
+export interface VerbEntry {
+  id: number;
+  base: string;
+  past: string;
+  pastParticiple: string;
+  presentParticiple: string;
+  spriteName: string;
+}
 
-// Section B Questions
-export const SECTION_B_DATA = [
+export const SECTION_A_DATA: VerbEntry[] = [
   {
     id: 1,
-    sentence: 'They should finished their homework before playing games.',
-    errorWord: 'finished',
-    correctWord: 'finish',
-    acceptedAnswers: ['finish'],
-    correctedSentence: 'They should finish their homework before playing games.',
-    ruleExplanation: 'After modal verbs like "should", always use the base form of the verb ("finish", not "finished").',
+    base: 'cut',
+    past: 'cut',
+    pastParticiple: 'cut',
+    presentParticiple: 'cutting',
+    spriteName: 'cut_verb',
   },
   {
     id: 2,
-    sentence: 'He should writes clearly so everyone can read his work.',
-    errorWord: 'writes',
-    correctWord: 'write',
-    acceptedAnswers: ['write'],
-    correctedSentence: 'He should write clearly so everyone can read his work.',
-    ruleExplanation: 'After "should", use the bare infinitive / base form ("write", not "writes").',
+    base: 'do',
+    past: 'did',
+    pastParticiple: 'done',
+    presentParticiple: 'doing',
+    spriteName: 'do_verb',
   },
   {
     id: 3,
-    sentence: 'The girl should jump the queue in the canteen.',
-    errorWord: 'should',
-    correctWord: 'should not',
-    acceptedAnswers: ['should not', "shouldn't", 'shouldnt'],
-    correctedSentence: 'The girl should not jump the queue in the canteen.',
-    ruleExplanation: 'Jumping the queue is bad manners. She "should not" or "shouldn\'t" jump the queue.',
+    base: 'eat',
+    past: 'ate',
+    pastParticiple: 'eaten',
+    presentParticiple: 'eating',
+    spriteName: 'eat_verb',
   },
   {
     id: 4,
-    sentence: 'Speak polite when you ask the teacher for help.',
-    errorWord: 'polite',
-    correctWord: 'politely',
-    acceptedAnswers: ['politely'],
-    correctedSentence: 'Speak politely when you ask the teacher for help.',
-    ruleExplanation: 'We need an adverb ("politely") to describe the action verb "speak", not an adjective ("polite").',
+    base: 'come',
+    past: 'came',
+    pastParticiple: 'come',
+    presentParticiple: 'coming',
+    spriteName: 'come_verb',
   },
   {
     id: 5,
-    sentence: 'Jack should run noisily in the library.',
-    errorWord: 'should',
-    correctWord: 'should not',
-    acceptedAnswers: ['should not', "shouldn't", 'shouldnt', 'not', 'quietly'],
-    correctedSentence: 'Jack should not run noisily in the library.',
-    ruleExplanation: 'Libraries are quiet study spaces. Jack "should not" make noise or run.',
-  },
-];
-
-// Section D Questions
-export const SECTION_D_DATA = [
-  {
-    id: 1,
-    sentence1: 'This boy is crying.',
-    sentence2: 'His name is Ben.',
-    modelAnswer: 'The boy who is crying is Ben.',
-    acceptableMatches: [
-      'the boy who is crying is ben',
-      'this boy who is crying is ben',
-      'ben is the boy who is crying',
-      'the boy who is crying is named ben',
-      'this boy who is crying is named ben',
-      'ben is the boy who is crying.',
-      'the boy who is crying is ben.',
-      "ben is the boy who's crying",
-    ],
-    hint: 'Start with "The boy who..." or "Ben is the boy who..."',
-  },
-  {
-    id: 2,
-    sentence1: 'The girl is wearing a blue dress.',
-    sentence2: 'Her name is Lucy.',
-    modelAnswer: 'The girl who is wearing a blue dress is Lucy.',
-    acceptableMatches: [
-      'the girl who is wearing a blue dress is lucy',
-      'lucy is the girl who is wearing a blue dress',
-      'the girl who is wearing a blue dress is named lucy',
-      'the girl who is wearing a blue dress is lucy.',
-      'lucy is the girl who is wearing a blue dress.',
-      "lucy is the girl who's wearing a blue dress",
-    ],
-    hint: 'Combine both sentences into one using "who".',
-  },
-  {
-    id: 3,
-    sentence1: 'This man is tall and strong.',
-    sentence2: 'His name is Mr Chan.',
-    modelAnswer: 'The man who is tall and strong is Mr Chan.',
-    acceptableMatches: [
-      'the man who is tall and strong is mr chan',
-      'this man who is tall and strong is mr chan',
-      'mr chan is the man who is tall and strong',
-      'the man who is tall and strong is named mr chan',
-      'the man who is tall and strong is mr chan.',
-      'mr chan is the man who is tall and strong.',
-      'the man who is tall and strong is mr. chan',
-      'mr. chan is the man who is tall and strong',
-    ],
-    hint: 'Identify the subject ("Mr Chan" or "The man") and connect with "who is tall and strong".',
-  },
-];
-
-// Section E Questions
-export const SECTION_E_DATA = [
-  {
-    id: 1,
-    sentence: 'Mia walked into the school party ___ a beautiful blue dress and black sandals.',
-    answer: 'in',
-    focusItem: 'a beautiful blue dress and black sandals (clothing)',
-    explanation: 'A dress and sandals are articles of clothing, so we use "IN".',
-  },
-  {
-    id: 2,
-    sentence: 'Look at that little boy ___ the adorable green sandals on his feet near the playground.',
-    answer: 'with',
-    focusItem: 'the adorable green sandals on his feet (item he has on his feet)',
-    explanation: 'Here "with" indicates the item he has with him / on his feet.',
-  },
-  {
-    id: 3,
-    sentence: 'The boy ___ a shiny diamond ring on his finger smiled happily at his friends.',
-    answer: 'with',
-    focusItem: 'a shiny diamond ring (an accessory/item he has on his finger)',
-    explanation: 'A diamond ring is an accessory someone possesses or wears on their finger, so we use "WITH".',
-  },
-  {
-    id: 4,
-    sentence: 'My aunt looks very handsome ___ her warm winter coat on this cold morning.',
-    answer: 'in',
-    focusItem: 'her warm winter coat (garment she is dressed in)',
-    explanation: 'For a coat someone is wearing / dressed inside, use "IN".',
-  },
-  {
-    id: 5,
-    sentence: 'The woman ___ the dark sunglasses is our friendly Maths teacher from next door.',
-    answer: 'with',
-    focusItem: 'the dark sunglasses (eyewear accessory)',
-    explanation: 'Glasses and sunglasses are accessories someone has/wears, so we use "WITH".',
+    base: 'cost',
+    past: 'cost',
+    pastParticiple: 'cost',
+    presentParticiple: 'costing',
+    spriteName: 'cost_verb',
   },
   {
     id: 6,
-    sentence: 'The tired tourist ___ the heavy luggage asked for directions at the busy train station.',
-    answer: 'with',
-    focusItem: 'the heavy luggage (something they are carrying)',
-    explanation: 'Luggage is an object the tourist is carrying, so we use "WITH".',
+    base: 'fall',
+    past: 'fell',
+    pastParticiple: 'fallen',
+    presentParticiple: 'falling',
+    spriteName: 'fall_verb',
   },
   {
     id: 7,
-    sentence: 'Mr Wong drew a long, straight line ___ a plastic ruler during our art lesson.',
-    answer: 'with',
-    focusItem: 'a plastic ruler (an instrument / tool used)',
-    explanation: 'A ruler is a tool used to perform an action, so we use "WITH".',
+    base: 'bring',
+    past: 'brought',
+    pastParticiple: 'brought',
+    presentParticiple: 'bringing',
+    spriteName: 'bring_verb',
   },
   {
     id: 8,
-    sentence: 'Amy matched her new shoes ___ a colourful leather accessory for the school show.',
-    answer: 'with',
-    focusItem: 'a colourful leather accessory (paired item)',
-    explanation: 'To match something with another item, we use the preposition "WITH".',
+    base: 'drink',
+    past: 'drank',
+    pastParticiple: 'drunk',
+    presentParticiple: 'drinking',
+    spriteName: 'drink_verb',
   },
 ];
 
-// Section G Questions (Verb Table)
-export const SECTION_G_DATA = [
-  { id: 1, base: 'become', past: 'became', pastParticiple: 'become', presentParticiple: 'becoming' },
-  { id: 2, base: 'break', past: 'broke', pastParticiple: 'broken', presentParticiple: 'breaking' },
-  { id: 3, base: 'bring', past: 'brought', pastParticiple: 'brought', presentParticiple: 'bringing' },
-  { id: 4, base: 'draw', past: 'drew', pastParticiple: 'drawn', presentParticiple: 'drawing' },
-  { id: 5, base: 'come', past: 'came', pastParticiple: 'come', presentParticiple: 'coming' },
-  { id: 6, base: 'cut', past: 'cut', pastParticiple: 'cut', presentParticiple: 'cutting' },
-  { id: 7, base: 'do', past: 'did', pastParticiple: 'done', presentParticiple: 'doing' },
-  { id: 8, base: 'cost', past: 'cost', pastParticiple: 'cost', presentParticiple: 'costing' },
+// ==================== SECTION B DATA (Chapter 3 Vocabulary: 6 questions) ====================
+export interface VocabQuestion {
+  id: number;
+  sentenceBefore: string;
+  sentenceAfter: string;
+  correctWord: string;
+  spriteName: string;
+  acceptedAnswers: string[];
+}
+
+export const SECTION_B_WORDS = [
+  'disgusting',
+  'unhealthy',
+  'popular',
+  'delicious',
+  'heavy',
+  'soya milk',
 ];
 
-// Section H Questions (Vocabulary Mine)
-export const SECTION_H_WORDS = ['accessory', 'midnight', 'sandals', 'leader', 'diamond', 'skill'];
-
-export const SECTION_H_DATA = [
+export const SECTION_B_DATA: VocabQuestion[] = [
   {
     id: 1,
-    sentence: 'We love wearing ___ when the weather is hot.',
-    answer: 'sandals',
-    clue: 'Open summer footwear.',
+    sentenceBefore: 'Hamburgers and fried chicken have a lot of fat. Eating too much is',
+    sentenceAfter: '.',
+    correctWord: 'unhealthy',
+    spriteName: 'unhealthy_junk',
+    acceptedAnswers: ['unhealthy'],
   },
   {
     id: 2,
-    sentence: 'This scarf is the perfect ___ to match your coat.',
-    answer: 'accessory',
-    clue: 'A decorative addition to an outfit.',
+    sentenceBefore: 'Grandma cannot lift the big box because it is too',
+    sentenceAfter: '.',
+    correctWord: 'heavy',
+    spriteName: 'heavy_box',
+    acceptedAnswers: ['heavy'],
   },
   {
     id: 3,
-    sentence: 'It is not healthy for pupils to eat heavy snacks at ___.',
-    answer: 'midnight',
-    clue: 'Twelve o’clock at night.',
+    sentenceBefore: 'Football is a',
+    sentenceAfter: 'game around the world.',
+    correctWord: 'popular',
+    spriteName: 'football',
+    acceptedAnswers: ['popular'],
   },
   {
     id: 4,
-    sentence: 'Our team ___ always helps the coach clean the board.',
-    answer: 'leader',
-    clue: 'The head or captain of a group.',
+    sentenceBefore: 'My sister loves chocolate cake because it is sweet and',
+    sentenceAfter: '.',
+    correctWord: 'delicious',
+    spriteName: 'chocolate_cake',
+    acceptedAnswers: ['delicious'],
   },
   {
     id: 5,
-    sentence: 'Dr Darko and his gang are going to hide the ___ tonight.',
-    answer: 'diamond',
-    clue: 'A precious sparkling gemstone.',
+    sentenceBefore: 'I often have a bowl of cereal with fresh',
+    sentenceAfter: 'in the morning.',
+    correctWord: 'soya milk',
+    spriteName: 'soya_bowl',
+    acceptedAnswers: ['soya milk', 'soya-milk', 'soy milk'],
   },
   {
     id: 6,
-    sentence: 'Good drawing ___ can help you to make beautiful pictures.',
-    answer: 'skill',
-    clue: 'The ability to do something well through practice.',
+    sentenceBefore: 'The fish smells bad and tastes',
+    sentenceAfter: '!',
+    correctWord: 'disgusting',
+    spriteName: 'rotten_fish',
+    acceptedAnswers: ['disgusting'],
   },
 ];
 
-// Section I Questions (Translation Library)
-export const SECTION_I_DATA = [
+// ==================== SECTION E DATA (Quantifiers Picnic Matching: 5 items) ====================
+export interface QuantifierMatchItem {
+  id: number;
+  quantifier: string;
+  correctFoodKey: string;
+  correctFoodText: string;
+  quantifierSprite: string;
+  foodSprite: string;
+}
+
+export const SECTION_E_FOOD_OPTIONS = [
+  { key: 'A', text: 'nuts', sprite: 'nuts' },
+  { key: 'B', text: 'soya milk', sprite: 'soya_milk' },
+  { key: 'C', text: 'grapes', sprite: 'grapes' },
+  { key: 'D', text: 'seaweed', sprite: 'seaweed' },
+  { key: 'E', text: 'chocolate', sprite: 'chocolate' },
+];
+
+export const SECTION_E_DATA: QuantifierMatchItem[] = [
   {
     id: 1,
-    prompt: 'Who’s the boy with the glasses?',
-    type: 'EN_TO_ZH',
-    modelAnswer: '那個戴眼鏡的男生是誰？',
-    acceptableChineseKeywords: ['戴眼鏡', '戴著眼鏡', '戴鏡', '誰', '男生', '男孩', '男子'],
-    explanation: 'with the glasses = 戴著眼鏡; who\'s the boy = 那個男生是誰？',
+    quantifier: 'a bar of',
+    correctFoodKey: 'E',
+    correctFoodText: 'chocolate',
+    quantifierSprite: 'chocolate',
+    foodSprite: 'chocolate',
   },
   {
     id: 2,
-    prompt: 'Kenny is the boy who has curly blonde hair.',
-    type: 'EN_TO_ZH',
-    modelAnswer: 'Kenny 是那個有一頭金色捲髮的男孩。',
-    acceptableChineseKeywords: ['kenny', '肯尼', '金', '捲髮', '卷髮', '捲毛', '男孩', '男生'],
-    explanation: 'who has curly blonde hair = 有金色捲髮的; boy = 男孩。',
+    quantifier: 'a packet of',
+    correctFoodKey: 'D',
+    correctFoodText: 'seaweed',
+    quantifierSprite: 'seaweed',
+    foodSprite: 'seaweed',
   },
   {
     id: 3,
-    prompt: '那個穿著黑色西裝的男生是誰？',
-    type: 'ZH_TO_EN',
-    modelAnswer: 'Who is the boy in the black suit?',
-    acceptableEnglishMatches: [
-      'who is the boy in the black suit',
-      "who's the boy in the black suit",
-      'who is the boy in a black suit',
-      "who's the boy in a black suit",
-      'who is the man in the black suit',
-      "who's the man in the black suit",
-      'who is the boy wearing a black suit',
-      'who is the boy wearing the black suit',
-    ],
-    explanation: 'Use "IN" for clothing ("in the black suit") and "Who is the boy...?"',
+    quantifier: 'a tin of',
+    correctFoodKey: 'A',
+    correctFoodText: 'nuts',
+    quantifierSprite: 'nuts',
+    foodSprite: 'nuts',
   },
   {
     id: 4,
-    prompt: 'Tom 是那個戴著連指手套的男生。',
-    type: 'ZH_TO_EN',
-    modelAnswer: 'Tom is the boy with the mittens.',
-    acceptableEnglishMatches: [
-      'tom is the boy with the mittens',
-      'tom is the boy with mittens',
-      'tom is the boy wearing mittens',
-      'tom is the boy who is wearing mittens',
-      'tom is the boy who has mittens',
-      'tom is the boy wearing the mittens',
-      'tom is the boy who is wearing the mittens',
-    ],
-    explanation: 'mittens = 連指手套. Use "with the mittens" or "wearing mittens".',
+    quantifier: 'a bunch of',
+    correctFoodKey: 'C',
+    correctFoodText: 'grapes',
+    quantifierSprite: 'grapes',
+    foodSprite: 'grapes',
+  },
+  {
+    id: 5,
+    quantifier: 'a carton of',
+    correctFoodKey: 'B',
+    correctFoodText: 'soya milk',
+    quantifierSprite: 'soya_milk',
+    foodSprite: 'soya_milk',
   },
 ];
 
-// Section K Questions (Fox Cottage)
-export const SECTION_K_WORDS = ['rude', 'tidy', 'polite', 'noisy', 'quick', 'quiet', 'careless'];
+// ==================== SECTION F DATA (Subject-Verb Agreement: 10 questions) ====================
+export interface SubjectVerbItem {
+  id: number;
+  prefix: string;
+  optA: string;
+  optB: string;
+  suffix: string;
+  correctKey: 'A' | 'B';
+  correctWord: string;
+  verbFamily: string;
+  spriteName: string;
+}
 
-export const SECTION_K_DATA = {
-  dialogueLines: [
-    { speaker: 'Fox A', text: 'What are we doing in our home?' },
-    {
-      speaker: 'Fox B',
-      text: 'Shh! You should not speak (1) [blank]. Our family is resting nearby!',
-      blankIndex: 1,
-      targetBaseWord: 'noisy',
-      correctAnswer: 'noisily',
-      acceptedAnswers: ['noisily'],
-      hint: 'adverb from "noisy"',
-    },
-    {
-      speaker: 'Fox B',
-      text: 'We need to tidy the living room. Hurry, you (2) [blank] move (3) [blank].',
-      blankIndex: 2,
-      targetBaseWord: 'should',
-      correctAnswer: 'should',
-      acceptedAnswers: ['should'],
-      hint: 'modal advice verb',
-      secondaryBlank: {
-        blankIndex: 3,
-        targetBaseWord: 'quick',
-        correctAnswer: 'quickly',
-        acceptedAnswers: ['quickly'],
-        hint: 'adverb from "quick"',
-      },
-    },
-    {
-      speaker: 'Fox B',
-      text: 'We don’t want to behave (4) [blank] and knock over the flower vase.',
-      blankIndex: 4,
-      targetBaseWord: 'careless',
-      correctAnswer: 'carelessly',
-      acceptedAnswers: ['carelessly'],
-      hint: 'adverb from "careless"',
-    },
-    {
-      speaker: 'Fox B',
-      text: 'You should walk (5) [blank], or our family will hear us.',
-      blankIndex: 5,
-      targetBaseWord: 'quiet',
-      correctAnswer: 'quietly',
-      acceptedAnswers: ['quietly'],
-      hint: 'adverb from "quiet"',
-    },
-    { speaker: 'Fox A', text: 'Hand over that big cushion to me right now!' },
-    {
-      speaker: 'Fox B',
-      text: 'You (6) [blank] speak rudely to me.',
-      blankIndex: 6,
-      targetBaseWord: 'should not',
-      correctAnswer: "shouldn't",
-      acceptedAnswers: ["shouldn't", 'should not', 'shouldnt'],
-      hint: 'negative advice ("should not")',
-    },
-    {
-      speaker: 'Fox A',
-      text: 'I’m sorry! I (7) [blank] ask politely. May I please have that cushion?',
-      blankIndex: 7,
-      targetBaseWord: 'should',
-      correctAnswer: 'should',
-      acceptedAnswers: ['should'],
-      hint: 'positive advice verb',
-    },
-    { speaker: 'Fox B', text: 'Of course! Here you go.' },
-  ],
-};
+export const SECTION_F_DATA: SubjectVerbItem[] = [
+  {
+    id: 1,
+    prefix: 'I',
+    optA: 'cut',
+    optB: 'cuts',
+    suffix: 'the apples for lunch every day.',
+    correctKey: 'A',
+    correctWord: 'cut',
+    verbFamily: 'cut',
+    spriteName: 'cut_verb',
+  },
+  {
+    id: 2,
+    prefix: 'She',
+    optA: 'eat',
+    optB: 'eats',
+    suffix: 'an egg for breakfast every morning.',
+    correctKey: 'B',
+    correctWord: 'eats',
+    verbFamily: 'eat',
+    spriteName: 'eat_verb',
+  },
+  {
+    id: 3,
+    prefix: 'They',
+    optA: 'do',
+    optB: 'does',
+    suffix: 'their homework together after school.',
+    correctKey: 'A',
+    correctWord: 'do',
+    verbFamily: 'do',
+    spriteName: 'do_verb',
+  },
+  {
+    id: 4,
+    prefix: '',
+    optA: 'Do',
+    optB: 'Does',
+    suffix: 'you eat dinner at 6:00 p.m. every day?',
+    correctKey: 'A',
+    correctWord: 'Do',
+    verbFamily: 'do',
+    spriteName: 'do_verb',
+  },
+  {
+    id: 5,
+    prefix: 'My brother',
+    optA: 'cut',
+    optB: 'cuts',
+    suffix: 'the watermelon into slices for the picnic.',
+    correctKey: 'B',
+    correctWord: 'cuts',
+    verbFamily: 'cut',
+    spriteName: 'cut_verb',
+  },
+  {
+    id: 6,
+    prefix: 'We',
+    optA: 'eat',
+    optB: 'eats',
+    suffix: 'fresh vegetable salad with our lunch.',
+    correctKey: 'A',
+    correctWord: 'eat',
+    verbFamily: 'eat',
+    spriteName: 'salad',
+  },
+  {
+    id: 7,
+    prefix: 'Jason',
+    optA: 'do',
+    optB: 'does',
+    suffix: 'his morning revision before breakfast.',
+    correctKey: 'B',
+    correctWord: 'does',
+    verbFamily: 'do',
+    spriteName: 'do_verb',
+  },
+  {
+    id: 8,
+    prefix: '',
+    optA: 'Do',
+    optB: 'Does',
+    suffix: 'the boy do his exercise in the playground?',
+    correctKey: 'B',
+    correctWord: 'Does',
+    verbFamily: 'do',
+    spriteName: 'do_verb',
+  },
+  {
+    id: 9,
+    prefix: 'The little puppy',
+    optA: 'drink',
+    optB: 'drinks',
+    suffix: 'fresh water after playing on the grass.',
+    correctKey: 'B',
+    correctWord: 'drinks',
+    verbFamily: 'drink',
+    spriteName: 'drink_verb',
+  },
+  {
+    id: 10,
+    prefix: 'Uncle Sam and Aunt May',
+    optA: 'bring',
+    optB: 'brings',
+    suffix: 'a basket of juicy strawberries from the farm.',
+    correctKey: 'A',
+    correctWord: 'bring',
+    verbFamily: 'bring',
+    spriteName: 'bring_verb',
+  },
+];
 
-// Farm Decorations for Stardew Valley Farmstead
-export const FARM_DECORATIONS: FarmDecoration[] = [
+// ==================== SECTION G DATA (Correct the Words: 5 questions) ====================
+export interface WordCorrectionItem {
+  id: number;
+  originalSentence: string;
+  incorrectWord: string;
+  correctWord: string;
+  acceptedAnswers: string[];
+  spriteName: string;
+}
+
+export const SECTION_G_DATA: WordCorrectionItem[] = [
+  {
+    id: 1,
+    originalSentence: 'Bill is fatter then Ben.',
+    incorrectWord: 'then',
+    correctWord: 'than',
+    acceptedAnswers: ['than'],
+    spriteName: 'scarecrow',
+  },
+  {
+    id: 2,
+    originalSentence: 'Tin is the older in Class C.',
+    incorrectWord: 'older',
+    correctWord: 'oldest',
+    acceptedAnswers: ['oldest'],
+    spriteName: 'librarian',
+  },
+  {
+    id: 3,
+    originalSentence: "John's tail is longest than Tom's tail.",
+    incorrectWord: 'longest',
+    correctWord: 'longer',
+    acceptedAnswers: ['longer'],
+    spriteName: 'rabbit',
+  },
+  {
+    id: 4,
+    originalSentence: "Bob's tail is the shorter.",
+    incorrectWord: 'shorter',
+    correctWord: 'shortest',
+    acceptedAnswers: ['shortest'],
+    spriteName: 'foxes',
+  },
+  {
+    id: 5,
+    originalSentence: 'The Restaurant has the most deliciousest food.',
+    incorrectWord: 'most deliciousest',
+    correctWord: 'most delicious',
+    acceptedAnswers: ['most delicious', 'delicious'],
+    spriteName: 'pizza',
+  },
+];
+
+// ==================== SECTION H DATA (Conjunction Connections: 10 questions) ====================
+export interface ConjunctionItem {
+  id: number;
+  pattern: 'both_and' | 'either_or' | 'either' | 'too' | 'but';
+  sentencePart1: string;
+  sentencePart2: string;
+  sentencePart3?: string;
+  expectedWord1: string;
+  expectedWord2?: string;
+  spriteName: string;
+}
+
+export const SECTION_H_DATA: ConjunctionItem[] = [
+  {
+    id: 1,
+    pattern: 'both_and',
+    sentencePart1: 'My father can speak',
+    sentencePart2: 'English',
+    sentencePart3: 'Chinese.',
+    expectedWord1: 'both',
+    expectedWord2: 'and',
+    spriteName: 'conjunction_bridge',
+  },
+  {
+    id: 2,
+    pattern: 'either',
+    sentencePart1: "Cindy doesn't like PE. She doesn't like Maths",
+    sentencePart2: '.',
+    expectedWord1: 'either',
+    spriteName: 'conjunction_bridge',
+  },
+  {
+    id: 3,
+    pattern: 'but',
+    sentencePart1: 'Peter is good at math,',
+    sentencePart2: 'his English is not very good.',
+    expectedWord1: 'but',
+    spriteName: 'conjunction_bridge',
+  },
+  {
+    id: 4,
+    pattern: 'too',
+    sentencePart1: 'I like Music. I like General Studies',
+    sentencePart2: '.',
+    expectedWord1: 'too',
+    spriteName: 'conjunction_bridge',
+  },
+  {
+    id: 5,
+    pattern: 'both_and',
+    sentencePart1: 'Uncle David can play',
+    sentencePart2: 'the guitar',
+    sentencePart3: 'the piano.',
+    expectedWord1: 'both',
+    expectedWord2: 'and',
+    spriteName: 'piano',
+  },
+  {
+    id: 6,
+    pattern: 'either',
+    sentencePart1: "Tommy does not drink coffee. He does not drink milk",
+    sentencePart2: '.',
+    expectedWord1: 'either',
+    spriteName: 'drink_verb',
+  },
+  {
+    id: 7,
+    pattern: 'but',
+    sentencePart1: 'Jenny wanted to go hiking,',
+    sentencePart2: 'it started to rain heavily.',
+    expectedWord1: 'but',
+    spriteName: 'fall_verb',
+  },
+  {
+    id: 8,
+    pattern: 'too',
+    sentencePart1: 'Amy loves drawing. Her brother likes painting',
+    sentencePart2: '.',
+    expectedWord1: 'too',
+    spriteName: 'reading',
+  },
+  {
+    id: 9,
+    pattern: 'either_or',
+    sentencePart1: 'You can have',
+    sentencePart2: 'orange juice',
+    sentencePart3: 'apple juice for breakfast.',
+    expectedWord1: 'either',
+    expectedWord2: 'or',
+    spriteName: 'drink_verb',
+  },
+  {
+    id: 10,
+    pattern: 'but',
+    sentencePart1: 'The pupils were tired after the run,',
+    sentencePart2: 'they were still smiling happily.',
+    expectedWord1: 'but',
+    spriteName: 'trophy',
+  },
+];
+
+// ==================== SECTION I DATA (Adjectives Comparatives: 5 questions) ====================
+export interface FoodReviewItem {
+  id: number;
+  baseWord: string;
+  sentenceBefore: string;
+  sentenceAfter: string;
+  correctWord: string;
+  acceptedAnswers: string[];
+  spriteName: string;
+}
+
+export const SECTION_I_DATA: FoodReviewItem[] = [
+  {
+    id: 1,
+    baseWord: 'cheap',
+    sentenceBefore: 'The food at Burger House is the',
+    sentenceAfter: '.',
+    correctWord: 'cheapest',
+    acceptedAnswers: ['cheapest'],
+    spriteName: 'cost_verb',
+  },
+  {
+    id: 2,
+    baseWord: 'healthy',
+    sentenceBefore: 'I think salad is',
+    sentenceAfter: 'than burgers.',
+    correctWord: 'healthier',
+    acceptedAnswers: ['healthier'],
+    spriteName: 'salad',
+  },
+  {
+    id: 3,
+    baseWord: 'popular',
+    sentenceBefore: 'Among the three restaurants, Burger House is the',
+    sentenceAfter: 'restaurant.',
+    correctWord: 'most popular',
+    acceptedAnswers: ['most popular'],
+    spriteName: 'burger',
+  },
+  {
+    id: 4,
+    baseWord: 'delicious',
+    sentenceBefore: 'The food at Burger House is more',
+    sentenceAfter: 'than Burger King.',
+    correctWord: 'delicious',
+    acceptedAnswers: ['delicious'],
+    spriteName: 'pizza',
+  },
+  {
+    id: 5,
+    baseWord: 'expensive',
+    sentenceBefore: 'The food at Burger Town is the most',
+    sentenceAfter: '.',
+    correctWord: 'expensive',
+    acceptedAnswers: ['expensive'],
+    spriteName: 'steak',
+  },
+];
+
+// ==================== SECTION K DATA (Class 4B After-School Survey) ====================
+export interface SurveyActivity {
+  name: string;
+  count: number;
+  spriteName: string;
+  color: string;
+}
+
+export const SECTION_K_ACTIVITIES: SurveyActivity[] = [
+  { name: 'texting their friends', count: 8, spriteName: 'texting', color: '#38bdf8' },
+  { name: 'playing volleyball', count: 6, spriteName: 'volleyball', color: '#f59e0b' },
+  { name: 'going cycling', count: 5, spriteName: 'cycling', color: '#10b981' },
+  { name: 'playing the piano', count: 3, spriteName: 'piano', color: '#a855f7' },
+  { name: 'reading newspapers', count: 2, spriteName: 'reading', color: '#ec4899' },
+  { name: 'going rock climbing', count: 1, spriteName: 'rock_climbing', color: '#ef4444' },
+];
+
+export interface SurveyReportQuestion {
+  id: number;
+  count: number;
+  prefix: string;
+  suffix: string;
+  correctActivity: string;
+  acceptedAnswers: string[];
+  spriteName: string;
+}
+
+export const SECTION_K_QUESTIONS: SurveyReportQuestion[] = [
+  {
+    id: 1,
+    count: 8,
+    prefix: '8 of them like',
+    suffix: '.',
+    correctActivity: 'texting their friends',
+    acceptedAnswers: ['texting their friends', 'texting friends', 'texting'],
+    spriteName: 'texting',
+  },
+  {
+    id: 2,
+    count: 6,
+    prefix: '6 pupils like',
+    suffix: '.',
+    correctActivity: 'playing volleyball',
+    acceptedAnswers: ['playing volleyball', 'volleyball'],
+    spriteName: 'volleyball',
+  },
+  {
+    id: 3,
+    count: 5,
+    prefix: '5 of them like',
+    suffix: '.',
+    correctActivity: 'going cycling',
+    acceptedAnswers: ['going cycling', 'cycling'],
+    spriteName: 'cycling',
+  },
+  {
+    id: 4,
+    count: 3,
+    prefix: '3 pupils like',
+    suffix: '.',
+    correctActivity: 'playing the piano',
+    acceptedAnswers: ['playing the piano', 'piano'],
+    spriteName: 'piano',
+  },
+  {
+    id: 5,
+    count: 1,
+    prefix: 'Only one pupil likes',
+    suffix: '.',
+    correctActivity: 'going rock climbing',
+    acceptedAnswers: ['going rock climbing', 'rock climbing'],
+    spriteName: 'rock_climbing',
+  },
+];
+
+// ==================== FARM DECORATIONS & SHOP ====================
+export const FARM_SHOP_ITEMS: FarmDecoration[] = [
   {
     id: 'sunflower_patch',
-    name: 'Sunny Sunflowers',
+    name: 'Sunny Sunflower Patch',
     category: 'crop',
-    cost: 40,
-    starRequirement: 1,
-    description: 'Bright golden sunflowers that face the valley morning light.',
+    cost: 30,
+    starRequirement: 0,
+    description: 'A cheerful patch of golden sunflowers that glow in the autumn breeze.',
     pixelSvg: 'sunflower',
   },
   {
-    id: 'starfruit_melon',
-    name: 'Stardrop Melon',
+    id: 'sweet_melon',
+    name: 'Sweet Pink Melon',
     category: 'crop',
-    cost: 70,
-    starRequirement: 3,
-    description: 'A plump, juicy giant melon sweet as starlight.',
+    cost: 50,
+    starRequirement: 2,
+    description: 'Juicy summer melon grown with grammar wisdom.',
     pixelSvg: 'melon',
   },
   {
     id: 'clucking_hen',
-    name: 'Clucking Pixel Hen',
+    name: 'Cozy Clucking Hen',
     category: 'animal',
-    cost: 50,
-    starRequirement: 2,
-    description: 'Lays fresh golden eggs each morning behind the coop.',
+    cost: 75,
+    starRequirement: 4,
+    description: 'Lays fresh golden eggs every morning for breakfast.',
     pixelSvg: 'chicken',
   },
   {
-    id: 'fluffy_rabbit',
+    id: 'fluffy_bunny',
     name: 'Fluffy White Bunny',
     category: 'animal',
-    cost: 80,
-    starRequirement: 5,
-    description: 'Loves fresh clover and hops around the carrot patch.',
+    cost: 90,
+    starRequirement: 6,
+    description: 'Hops happily around the garden cabbage patches.',
     pixelSvg: 'rabbit',
   },
   {
-    id: 'spotted_cow',
+    id: 'gentle_cow',
     name: 'Gentle Dairy Cow',
     category: 'animal',
-    cost: 110,
-    starRequirement: 8,
-    description: 'Friendly farm cow that loves ear scratches and sweet hay.',
+    cost: 140,
+    starRequirement: 10,
+    description: 'Produces rich, fresh milk for the valley festival.',
     pixelSvg: 'cow',
   },
   {
-    id: 'wood_scarecrow',
-    name: 'Valley Scarecrow',
+    id: 'friendly_scarecrow',
+    name: 'Friendly Scarecrow',
     category: 'building',
     cost: 60,
-    starRequirement: 4,
-    description: 'Crafted with straw, a wooden post, and a cozy straw hat.',
+    starRequirement: 3,
+    description: 'Watches over your crops with a pleasant smile.',
     pixelSvg: 'scarecrow',
   },
   {
-    id: 'wishing_well',
-    name: 'Ancient Stone Well',
-    category: 'building',
-    cost: 120,
-    starRequirement: 10,
-    description: 'Draws fresh mineral water straight from the mountain spring.',
-    pixelSvg: 'well',
-  },
-  {
-    id: 'junimo_plush',
-    name: 'Magic Junimo Figurine',
+    id: 'magic_forest_junimo',
+    name: 'Magical Forest Junimo',
     category: 'special',
-    cost: 150,
+    cost: 200,
     starRequirement: 14,
-    description: 'A friendly forest spirit bringing luck and harmony to your farm.',
+    description: 'A friendly forest spirit blessing your farm with good fortune.',
     pixelSvg: 'junimo',
   },
+  {
+    id: 'golden_trophy',
+    name: 'Grammar Champion Cup',
+    category: 'special',
+    cost: 250,
+    starRequirement: 18,
+    description: 'Golden championship trophy awarded to the valley top scholar.',
+    pixelSvg: 'trophy',
+  },
 ];
+
+export const FARM_DECORATIONS = FARM_SHOP_ITEMS;
+

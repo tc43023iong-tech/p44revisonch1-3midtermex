@@ -13,14 +13,14 @@ interface AdventureMapProps {
 
 // Coordinates for pins on the valley map (percentage-based for responsive placement)
 const MAP_PINS: Record<SectionId, { x: number; y: number }> = {
-  A: { x: 55, y: 72 }, // Advice Village (central town square)
-  B: { x: 80, y: 74 }, // Grammar Workshop (carpenter/blacksmith)
-  D: { x: 18, y: 22 }, // Who's Forest (secret woods top-left)
-  E: { x: 38, y: 76 }, // Fashion Boutique (shopping district)
-  G: { x: 82, y: 44 }, // Verb Transformation Farm (barn & crops right)
-  H: { x: 85, y: 16 }, // Vocabulary Treasure Mine (mountain mine top-right)
-  I: { x: 25, y: 52 }, // Translation Library (cottage near river)
-  K: { x: 56, y: 26 }, // Fox Family Cottage (forest haven top-center)
+  A: { x: 82, y: 44 }, // Verb Transformation Farm (barn & crops right)
+  B: { x: 55, y: 72 }, // Vocabulary Feast (central town square)
+  E: { x: 38, y: 76 }, // Quantifiers Picnic (valley meadow)
+  F: { x: 80, y: 74 }, // Subject-Verb Agreement Challenge (carpenter workshop)
+  G: { x: 18, y: 22 }, // Comparative Word Correction (magical forest)
+  H: { x: 85, y: 16 }, // Conjunction Connections (mountain mine)
+  I: { x: 25, y: 52 }, // Valley Food Reviews (riverside cafe)
+  K: { x: 56, y: 26 }, // Class 4B Activity Survey (survey cottage)
 };
 
 export const AdventureMap: React.FC<AdventureMapProps> = ({
@@ -224,16 +224,6 @@ export const AdventureMap: React.FC<AdventureMapProps> = ({
               </div>
             </div>
 
-            {/* Grammar tip if available */}
-            {selectedLevel.grammarTip && (
-              <div className="bg-[#eef8eb] border-2 border-[#82b672] p-2.5 text-xs text-[#1e4612]">
-                <span className="font-bold block mb-0.5">{selectedLevel.grammarTip.title}</span>
-                <p className="whitespace-pre-line text-[11px] leading-relaxed">
-                  {selectedLevel.grammarTip.rule}
-                </p>
-              </div>
-            )}
-
             {/* Mode Selection & Launch Buttons */}
             <div className="flex flex-col gap-2.5 pt-2">
               <span className="text-xs font-bold text-[#78350f]">
@@ -283,7 +273,7 @@ export const AdventureMap: React.FC<AdventureMapProps> = ({
                   modeSelection === 'single' ? 'pixel-btn-blue' : 'pixel-btn-green'
                 }`}
               >
-                <span>Start {modeSelection === 'single' ? 'Single Player' : 'Two-Player Split Screen'}</span>
+                <span>Start {modeSelection === 'single' ? 'Single Player' : 'Two-Player Split Screen PK'}</span>
                 <PixelSprite name="check" size={16} />
               </button>
             </div>
@@ -291,7 +281,7 @@ export const AdventureMap: React.FC<AdventureMapProps> = ({
         )}
       </div>
 
-      {/* Quick Level List Drawer (Preserves A, B, D, E, G, H, I, K) */}
+      {/* Quick Level List Drawer (All 8 Quests: A, B, E, F, G, H, I, K) */}
       <div className="pixel-wood-dark p-3">
         <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#855328]">
           <span className="font-bold text-xs text-[#fed7aa]">

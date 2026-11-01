@@ -5,11 +5,14 @@ import { TWO_PLAYER_MCQ_DATA, MCQQuestion } from '../../data/twoPlayerMCQData';
 import { PixelSprite } from '../common/PixelSprite';
 import { soundManager } from '../../utils/sound';
 
+export const ALL_SECTIONS: SectionId[] = ['A', 'B', 'E', 'F', 'G', 'H', 'I', 'K'];
+
 interface SplitScreenGameProps {
   sectionId: SectionId;
   userData: UserSavedData;
   onFinishLevel: (stars: number, scoreGained: number) => void;
   onExit: () => void;
+  onChangeSection?: (newSectionId: SectionId) => void;
 }
 
 export const SplitScreenGame: React.FC<SplitScreenGameProps> = ({
@@ -17,9 +20,12 @@ export const SplitScreenGame: React.FC<SplitScreenGameProps> = ({
   userData,
   onFinishLevel,
   onExit,
+  onChangeSection,
 }) => {
-  const levelDef = LEVEL_DEFINITIONS[sectionId];
+  const levelDef = LEVEL_DEFINITIONS[sectionId] || LEVEL_DEFINITIONS['A'];
   const questions: MCQQuestion[] = TWO_PLAYER_MCQ_DATA[sectionId] || [];
+  const currentSectionIndex = ALL_SECTIONS.indexOf(sectionId);
+
   const [qIndex, setQIndex] = useState(0);
   const currentQ = questions[qIndex] || questions[0];
 
@@ -36,6 +42,7 @@ export const SplitScreenGame: React.FC<SplitScreenGameProps> = ({
   const [p1Submitted, setP1Submitted] = useState(false);
   const [p1IsCorrect, setP1IsCorrect] = useState<boolean | null>(null);
   const [p1SpeedBonus, setP1SpeedBonus] = useState(false);
+  const [p1Streak, setP1Streak] = useState(0);
 
   // Player 2 Independent State
   const [p2Score, setP2Score] = useState(0);
@@ -44,6 +51,34 @@ export const SplitScreenGame: React.FC<SplitScreenGameProps> = ({
   const [p2Submitted, setP2Submitted] = useState(false);
   const [p2IsCorrect, setP2IsCorrect] = useState<boolean | null>(null);
   const [p2SpeedBonus, setP2SpeedBonus] = useState(false);
+  const [p2Streak, setP2Streak] = useState(0);
+
+  // Reset when level changes
+  useEffect(() => {
+    setQIndex(0);
+    setIsGameOver(false);
+    setP1Score(0);
+    setP2Score(0);
+    setP1CorrectCount(0);
+    setP2CorrectCount(0);
+    setP1Streak(0);
+    setP2Streak(0);
+    resetRoundState();
+  }, [sectionId]);
+
+  const resetRoundState = () => {
+    setP1Timer(0);
+    setP2Timer(0);
+    setP1SelectedKey(null);
+    setP1Submitted(false);
+    setP1IsCorrect(null);
+    setP1SpeedBonus(false);
+
+    setP2SelectedKey(null);
+    setP2Submitted(false);
+    setP2IsCorrect(null);
+    setP2SpeedBonus(false);
+  };
 
   // Timer loop
   useEffect(() => {
@@ -59,7 +94,7 @@ export const SplitScreenGame: React.FC<SplitScreenGameProps> = ({
   const bothSubmitted = p1Submitted && p2Submitted;
 
   useEffect(() => {
-    if (bothSubmitted && p1IsCorrect === null && p2IsCorrect === null) {
+    if (bothSubmitted && p1IsCorrect === null && p2IsCorrect === null && currentQ) {
       const correctKey = currentQ.correctKey;
       const res1Correct = p1SelectedKey === correctKey;
       const res2Correct = p2SelectedKey === correctKey;
@@ -88,8 +123,19 @@ export const SplitScreenGame: React.FC<SplitScreenGameProps> = ({
       setP1Score((s) => s + s1);
       setP2Score((s) => s + s2);
 
-      if (res1Correct) setP1CorrectCount((c) => c + 1);
-      if (res2Correct) setP2CorrectCount((c) => c + 1);
+      if (res1Correct) {
+        setP1CorrectCount((c) => c + 1);
+        setP1Streak((st) => st + 1);
+      } else {
+        setP1Streak(0);
+      }
+
+      if (res2Correct) {
+        setP2CorrectCount((c) => c + 1);
+        setP2Streak((st) => st + 1);
+      } else {
+        setP2Streak(0);
+      }
 
       if (res1Correct || res2Correct) {
         soundManager.playCorrect();
@@ -99,7 +145,34 @@ export const SplitScreenGame: React.FC<SplitScreenGameProps> = ({
     }
   }, [bothSubmitted, currentQ]);
 
-  // INSTANT TAP FOR PLAYER 1: No submit button needed!
+  // Keyboard hotkeys for fast 2-player keyboard play
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (bothSubmitted || isGameOver || !currentQ) return;
+      const key = e.key.toLowerCase();
+
+      // P1: Q, W, E, R
+      if (!p1Submitted) {
+        if (key === 'q' && currentQ.options[0]) handleP1Tap(currentQ.options[0].key);
+        else if (key === 'w' && currentQ.options[1]) handleP1Tap(currentQ.options[1].key);
+        else if (key === 'e' && currentQ.options[2]) handleP1Tap(currentQ.options[2].key);
+        else if (key === 'r' && currentQ.options[3]) handleP1Tap(currentQ.options[3].key);
+      }
+
+      // P2: U, I, O, P
+      if (!p2Submitted) {
+        if (key === 'u' && currentQ.options[0]) handleP2Tap(currentQ.options[0].key);
+        else if (key === 'i' && currentQ.options[1]) handleP2Tap(currentQ.options[1].key);
+        else if (key === 'o' && currentQ.options[2]) handleP2Tap(currentQ.options[2].key);
+        else if (key === 'p' && currentQ.options[3]) handleP2Tap(currentQ.options[3].key);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [bothSubmitted, isGameOver, p1Submitted, p2Submitted, currentQ]);
+
+  // Tap handlers
   const handleP1Tap = (key: string) => {
     if (p1Submitted) return;
     soundManager.playClick();
@@ -107,7 +180,6 @@ export const SplitScreenGame: React.FC<SplitScreenGameProps> = ({
     setP1Submitted(true);
   };
 
-  // INSTANT TAP FOR PLAYER 2: No submit button needed!
   const handleP2Tap = (key: string) => {
     if (p2Submitted) return;
     soundManager.playClick();
@@ -119,457 +191,361 @@ export const SplitScreenGame: React.FC<SplitScreenGameProps> = ({
     soundManager.playClick();
     if (qIndex + 1 < questions.length) {
       setQIndex((prev) => prev + 1);
-      // Reset for next question
-      setP1SelectedKey(null);
-      setP2SelectedKey(null);
-      setP1Submitted(false);
-      setP2Submitted(false);
-      setP1IsCorrect(null);
-      setP2IsCorrect(null);
-      setP1Timer(0);
-      setP2Timer(0);
-      setP1SpeedBonus(false);
-      setP2SpeedBonus(false);
+      resetRoundState();
     } else {
+      soundManager.playLevelComplete();
       setIsGameOver(true);
-      soundManager.playVictory();
+      const totalScore = Math.max(p1Score, p2Score);
+      onFinishLevel(3, totalScore);
     }
   };
 
-  const getWinner = () => {
-    if (p1Score > p2Score) return 'Player 1 (Blue Farmer) wins!';
-    if (p2Score > p1Score) return 'Player 2 (Green Farmer) wins!';
-    return "It's an honorable tie! Both are champions!";
+  // Skip / Next Level at any time
+  const handleJumpToNextSection = () => {
+    soundManager.playClick();
+    if (currentSectionIndex < ALL_SECTIONS.length - 1) {
+      const nextSec = ALL_SECTIONS[currentSectionIndex + 1];
+      if (onChangeSection) onChangeSection(nextSec);
+    } else {
+      onExit();
+    }
   };
 
+  const handleJumpToPrevSection = () => {
+    soundManager.playClick();
+    if (currentSectionIndex > 0) {
+      const prevSec = ALL_SECTIONS[currentSectionIndex - 1];
+      if (onChangeSection) onChangeSection(prevSec);
+    } else {
+      onExit();
+    }
+  };
+
+  const levelProgressPercent = Math.round(((qIndex + (bothSubmitted ? 1 : 0)) / questions.length) * 100);
+
   return (
-    <div className="w-full max-w-7xl mx-auto px-2 sm:px-4 py-3 flex flex-col gap-3">
-      {/* Decorative Top Scene Strip */}
-      <div className="relative bg-[#5b7f3d] p-2.5 border-3 border-[#364f22] overflow-hidden shadow-md flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center -space-x-1">
-            <PixelSprite name="sunflower" size={22} />
-            <PixelSprite name="chicken" size={20} animate={true} />
+    <div className="relative w-full max-w-7xl mx-auto px-2 sm:px-4 py-3 flex flex-col gap-3">
+      {/* Top Banner & Universal Level Progress Bar */}
+      <div className="pixel-wood-box p-3 flex flex-col gap-2.5 shadow-md">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                soundManager.playClick();
+                onExit();
+              }}
+              className="pixel-btn-gold px-2.5 py-1 text-xs font-pixel flex items-center gap-1 cursor-pointer"
+            >
+              <span>🗺️ Map</span>
+            </button>
+
+            <button
+              onClick={handleJumpToPrevSection}
+              disabled={currentSectionIndex === 0}
+              className={`px-2.5 py-1 text-xs font-pixel border cursor-pointer ${
+                currentSectionIndex === 0
+                  ? 'bg-stone-300 text-stone-500 border-stone-400 opacity-50 cursor-not-allowed'
+                  : 'pixel-btn-blue'
+              }`}
+            >
+              ⬅ Prev
+            </button>
+
+            <div>
+              <span className="font-pixel text-[10px] text-[#8b5a2b] block">
+                2-Player Split-Screen PK • Level {currentSectionIndex + 1} of {ALL_SECTIONS.length}
+              </span>
+              <h2 className="font-pixel text-xs sm:text-sm text-[#4a2800] tracking-wide font-bold">
+                {levelDef.name}
+              </h2>
+            </div>
           </div>
-          <div>
-            <span className="font-pixel text-[11px] text-[#fff9db] font-bold block">
-              {levelDef.sectionCode}: {levelDef.name}
-            </span>
-            <span className="text-xs text-[#d9f99d] font-semibold">
-              Question {qIndex + 1} of {questions.length} · Tap any choice to lock answer!
-            </span>
+
+          {/* Guaranteed Next Level button */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleJumpToNextSection}
+              className="pixel-btn-green px-3 py-1.5 text-xs font-pixel flex items-center gap-1.5 cursor-pointer shadow animate-pulse hover:animate-none"
+              title="Skip or proceed to next level"
+            >
+              <span>Next Level ➔</span>
+            </button>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="flex items-center -space-x-1">
-            <PixelSprite name="rabbit" size={20} animate={true} />
-            <PixelSprite name="melon" size={20} />
+        {/* Progress Bar */}
+        <div className="w-full flex items-center gap-3">
+          <div className="flex-1 bg-[#4a2e13] h-3 border border-[#2b1807] overflow-hidden p-0.5">
+            <div
+              className="h-full bg-gradient-to-r from-[#3b82f6] via-[#f59e0b] to-[#10b981] transition-all duration-300"
+              style={{ width: `${levelProgressPercent}%` }}
+            />
           </div>
-          <button
-            onClick={() => {
-              soundManager.playClick();
-              onExit();
-            }}
-            className="text-xs font-semibold text-[#fef08a] hover:text-white underline cursor-pointer"
-          >
-            Exit to map
-          </button>
+          <span className="font-pixel text-[10px] text-[#78350f] shrink-0">
+            Duel {qIndex + 1}/{questions.length} ({levelProgressPercent}%)
+          </span>
         </div>
       </div>
 
-      {!isGameOver ? (
-        <div className="flex flex-col gap-3">
-          {/* Synchronous Split Screen Grid: Equal Left & Right vertical panels */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 items-stretch">
-            {/* ===================== LEFT: PLAYER 1 (BLUE) ===================== */}
-            <div className="pixel-wood-box p-4 border-4 border-[#1e40af] flex flex-col justify-between gap-3 bg-[#f0f7ff]">
-              {/* Player 1 HUD */}
-              <div className="flex items-center justify-between pb-2 border-b-2 border-[#93c5fd]">
-                <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 bg-[#bfdbfe] border-2 border-[#2563eb] flex items-center justify-center shrink-0">
-                    <PixelSprite name="player1" size={26} />
-                  </div>
-                  <div>
-                    <span className="font-bold text-xs text-[#1e3a8a] block">Player 1</span>
-                    <span className="text-[11px] text-[#2563eb] font-medium">Blue Farmer</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2.5">
-                  <span className="text-xs font-bold text-[#1e40af] bg-[#dbeafe] px-2 py-0.5 border border-[#93c5fd]">
-                    {p1Timer}s
-                  </span>
-                  <div className="flex items-center gap-1 bg-[#dbeafe] px-2 py-0.5 border border-[#93c5fd]">
-                    <PixelSprite name="coin_gold" size={14} />
-                    <span className="font-bold text-xs text-[#1e3a8a]">{p1Score} pts</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Progress bar P1 */}
-              <div className="w-full bg-[#cbd5e1] h-2 border border-[#94a3b8] overflow-hidden">
-                <div
-                  className="bg-[#2563eb] h-full transition-all duration-300"
-                  style={{
-                    width: `${((qIndex + (p1Submitted ? 1 : 0)) / questions.length) * 100}%`,
-                  }}
-                />
-              </div>
-
-              {/* Question Situation / Prompt Card */}
-              <div className="pixel-parchment p-3">
-                <span className="font-bold text-[11px] text-[#1e40af] block mb-1">
-                  Question {qIndex + 1}:
-                </span>
-                <p className="text-sm font-bold text-[#1e3a8a] leading-snug">
-                  "{currentQ.prompt}"
-                </p>
-                {currentQ.subPrompt && (
-                  <p className="text-xs text-[#3b82f6] font-semibold mt-1">
-                    {currentQ.subPrompt}
-                  </p>
-                )}
-              </div>
-
-              {/* Player 1 Multiple Choice Options - Tap Instantly! */}
-              <div className="flex flex-col gap-2">
-                {currentQ.options.map((opt) => {
-                  const isSelected = p1SelectedKey === opt.key;
-                  const isCorrectChoice = opt.key === currentQ.correctKey;
-
-                  let optClass = 'bg-[#fffaf0] border-[#93c5fd] text-[#1e3a8a] hover:bg-[#dbeafe]';
-                  if (isSelected) {
-                    optClass = 'bg-[#2563eb] text-white border-[#1d4ed8] shadow-[0_3px_0_#1e3a8a]';
-                  }
-
-                  if (bothSubmitted) {
-                    if (isCorrectChoice) {
-                      optClass = 'bg-[#22c55e] text-white border-[#15803d] font-bold shadow-[0_3px_0_#14532d]';
-                    } else if (isSelected && !isCorrectChoice) {
-                      optClass = 'bg-[#ef4444] text-white border-[#991b1b] opacity-80';
-                    } else {
-                      optClass = 'bg-[#f1f5f9] text-[#94a3b8] border-[#cbd5e1] opacity-50';
-                    }
-                  }
-
-                  return (
-                    <button
-                      key={opt.key}
-                      type="button"
-                      disabled={p1Submitted}
-                      onClick={() => handleP1Tap(opt.key)}
-                      className={`p-2.5 sm:p-3 border-2 text-left cursor-pointer transition-all flex items-start gap-2.5 rounded-xs ${optClass}`}
-                    >
-                      <span
-                        className={`font-pixel text-xs px-2 py-0.5 border shrink-0 mt-0.5 ${
-                          isSelected
-                            ? 'bg-[#1d4ed8] text-white border-[#172554]'
-                            : 'bg-[#dbeafe] text-[#1e40af] border-[#93c5fd]'
-                        }`}
-                      >
-                        {opt.key}
-                      </span>
-                      <span className="text-xs sm:text-sm font-semibold leading-snug flex-1">
-                        {opt.text}
-                      </span>
-                      {bothSubmitted && isCorrectChoice && (
-                        <PixelSprite name="check" size={16} className="mt-0.5" />
-                      )}
-                      {bothSubmitted && isSelected && !isCorrectChoice && (
-                        <PixelSprite name="cross" size={16} className="mt-0.5" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Player 1 Status Indicator (No separate submit button!) */}
-              <div className="pt-2 border-t border-[#bfdbfe]">
-                {!p1Submitted ? (
-                  <div className="text-xs text-[#2563eb] font-semibold text-center py-1">
-                    Tap your choice above to answer!
-                  </div>
-                ) : !bothSubmitted ? (
-                  <div className="bg-[#dbeafe] border-2 border-[#60a5fa] p-2 text-center flex items-center justify-center gap-2 animate-pulse">
-                    <PixelSprite name="chicken" size={20} animate={true} />
-                    <span className="font-semibold text-xs text-[#1e40af]">
-                      Choice locked! Waiting for Player 2...
-                    </span>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-between text-xs font-bold text-[#1e3a8a] bg-[#dbeafe] p-2 border border-[#93c5fd]">
-                    <div className="flex items-center gap-1.5">
-                      <PixelSprite name={p1IsCorrect ? 'check' : 'cross'} size={16} />
-                      <span>{p1IsCorrect ? 'Correct! (+10 pts)' : 'Incorrect (0 pts)'}</span>
-                    </div>
-                    {p1SpeedBonus && (
-                      <span className="text-[11px] text-[#854d0e] font-bold bg-[#fef08a] px-2 py-0.5 border border-[#eab308]">
-                        +5 Speed bonus!
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* ===================== RIGHT: PLAYER 2 (GREEN) ===================== */}
-            <div className="pixel-wood-box p-4 border-4 border-[#166534] flex flex-col justify-between gap-3 bg-[#f0fdf4]">
-              {/* Player 2 HUD */}
-              <div className="flex items-center justify-between pb-2 border-b-2 border-[#86efac]">
-                <div className="flex items-center gap-2">
-                  <div className="w-9 h-9 bg-[#bbf7d0] border-2 border-[#16a34a] flex items-center justify-center shrink-0">
-                    <PixelSprite name="player2" size={26} />
-                  </div>
-                  <div>
-                    <span className="font-bold text-xs text-[#14532d] block">Player 2</span>
-                    <span className="text-[11px] text-[#16a34a] font-medium">Green Farmer</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2.5">
-                  <span className="text-xs font-bold text-[#166534] bg-[#dcfce7] px-2 py-0.5 border border-[#86efac]">
-                    {p2Timer}s
-                  </span>
-                  <div className="flex items-center gap-1 bg-[#dcfce7] px-2 py-0.5 border border-[#86efac]">
-                    <PixelSprite name="coin_gold" size={14} />
-                    <span className="font-bold text-xs text-[#14532d]">{p2Score} pts</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Progress bar P2 */}
-              <div className="w-full bg-[#cbd5e1] h-2 border border-[#94a3b8] overflow-hidden">
-                <div
-                  className="bg-[#16a34a] h-full transition-all duration-300"
-                  style={{
-                    width: `${((qIndex + (p2Submitted ? 1 : 0)) / questions.length) * 100}%`,
-                  }}
-                />
-              </div>
-
-              {/* Question Situation / Prompt Card */}
-              <div className="pixel-parchment p-3">
-                <span className="font-bold text-[11px] text-[#15803d] block mb-1">
-                  Question {qIndex + 1}:
-                </span>
-                <p className="text-sm font-bold text-[#14532d] leading-snug">
-                  "{currentQ.prompt}"
-                </p>
-                {currentQ.subPrompt && (
-                  <p className="text-xs text-[#16a34a] font-semibold mt-1">
-                    {currentQ.subPrompt}
-                  </p>
-                )}
-              </div>
-
-              {/* Player 2 Multiple Choice Options - Tap Instantly! */}
-              <div className="flex flex-col gap-2">
-                {currentQ.options.map((opt) => {
-                  const isSelected = p2SelectedKey === opt.key;
-                  const isCorrectChoice = opt.key === currentQ.correctKey;
-
-                  let optClass = 'bg-[#fffaf0] border-[#86efac] text-[#14532d] hover:bg-[#dcfce7]';
-                  if (isSelected) {
-                    optClass = 'bg-[#16a34a] text-white border-[#15803d] shadow-[0_3px_0_#14532d]';
-                  }
-
-                  if (bothSubmitted) {
-                    if (isCorrectChoice) {
-                      optClass = 'bg-[#22c55e] text-white border-[#15803d] font-bold shadow-[0_3px_0_#14532d]';
-                    } else if (isSelected && !isCorrectChoice) {
-                      optClass = 'bg-[#ef4444] text-white border-[#991b1b] opacity-80';
-                    } else {
-                      optClass = 'bg-[#f1f5f9] text-[#94a3b8] border-[#cbd5e1] opacity-50';
-                    }
-                  }
-
-                  return (
-                    <button
-                      key={opt.key}
-                      type="button"
-                      disabled={p2Submitted}
-                      onClick={() => handleP2Tap(opt.key)}
-                      className={`p-2.5 sm:p-3 border-2 text-left cursor-pointer transition-all flex items-start gap-2.5 rounded-xs ${optClass}`}
-                    >
-                      <span
-                        className={`font-pixel text-xs px-2 py-0.5 border shrink-0 mt-0.5 ${
-                          isSelected
-                            ? 'bg-[#14532d] text-white border-[#052e16]'
-                            : 'bg-[#dcfce7] text-[#15803d] border-[#86efac]'
-                        }`}
-                      >
-                        {opt.key}
-                      </span>
-                      <span className="text-xs sm:text-sm font-semibold leading-snug flex-1">
-                        {opt.text}
-                      </span>
-                      {bothSubmitted && isCorrectChoice && (
-                        <PixelSprite name="check" size={16} className="mt-0.5" />
-                      )}
-                      {bothSubmitted && isSelected && !isCorrectChoice && (
-                        <PixelSprite name="cross" size={16} className="mt-0.5" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Player 2 Status Indicator (No separate submit button!) */}
-              <div className="pt-2 border-t border-[#bbf7d0]">
-                {!p2Submitted ? (
-                  <div className="text-xs text-[#16a34a] font-semibold text-center py-1">
-                    Tap your choice above to answer!
-                  </div>
-                ) : !bothSubmitted ? (
-                  <div className="bg-[#dcfce7] border-2 border-[#4ade80] p-2 text-center flex items-center justify-center gap-2 animate-pulse">
-                    <PixelSprite name="rabbit" size={20} animate={true} />
-                    <span className="font-semibold text-xs text-[#14532d]">
-                      Choice locked! Waiting for Player 1...
-                    </span>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-between text-xs font-bold text-[#14532d] bg-[#dcfce7] p-2 border border-[#86efac]">
-                    <div className="flex items-center gap-1.5">
-                      <PixelSprite name={p2IsCorrect ? 'check' : 'cross'} size={16} />
-                      <span>{p2IsCorrect ? 'Correct! (+10 pts)' : 'Incorrect (0 pts)'}</span>
-                    </div>
-                    {p2SpeedBonus && (
-                      <span className="text-[11px] text-[#854d0e] font-bold bg-[#fef08a] px-2 py-0.5 border border-[#eab308]">
-                        +5 Speed bonus!
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Both Ready: Feedback & Next Question Together Bar */}
-          {bothSubmitted && (
-            <div className="pixel-wood-dark p-3 text-center flex flex-col sm:flex-row items-center justify-between gap-3 animate-in fade-in">
-              <div className="text-xs text-[#fed7aa] font-medium text-left">
-                <span className="font-bold text-[#fde047]">Explanation: </span>
-                {currentQ.explanation}
-              </div>
-              <button
-                type="button"
-                onClick={handleNextTogether}
-                className="pixel-btn-gold px-6 py-2.5 text-xs sm:text-sm font-bold tracking-wide cursor-pointer flex items-center gap-2 shrink-0"
-              >
-                <span>
-                  {qIndex + 1 === questions.length
-                    ? 'View Final Battle Results →'
-                    : 'Next Question Together →'}
-                </span>
-                <PixelSprite name="check" size={16} />
-              </button>
-            </div>
-          )}
+      {/* Synchronous Split Screen Arena */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 relative">
+        {/* Central VS Badge */}
+        <div className="hidden md:flex absolute left-1/2 top-4 -translate-x-1/2 z-20 w-10 h-10 rounded-full bg-[#f59e0b] border-3 border-[#78350f] items-center justify-center font-pixel text-xs text-white shadow-xl">
+          VS
         </div>
-      ) : (
-        /* End of Battle Comparison Scoreboard */
-        <div className="pixel-wood-box p-6 sm:p-8 flex flex-col items-center text-center gap-5 max-w-2xl mx-auto w-full animate-in zoom-in-95">
-          <div className="w-16 h-16 bg-[#ffd885] border-3 border-[#8b5a2b] flex items-center justify-center p-2 shadow-md">
-            <PixelSprite name="trophy" size={44} animate={true} />
+
+        {/* ==================== PLAYER 1 (LEFT / BLUE) ==================== */}
+        <div className="pixel-wood-box p-3 sm:p-4 flex flex-col gap-3 border-4 border-[#1e3a8a] bg-[#eff6ff]">
+          {/* Header */}
+          <div className="flex items-center justify-between pb-2 border-b-2 border-[#93c5fd]">
+            <div className="flex items-center gap-2">
+              <PixelSprite name="player1" size={32} animate={p1Streak > 1} />
+              <div>
+                <span className="font-pixel text-xs text-[#1e40af] font-bold block">
+                  Player 1 (Blue)
+                </span>
+                <span className="text-[10px] text-[#3b82f6] font-semibold">
+                  Keys: Q, W, E, R / Tap
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="bg-[#1e40af] text-white px-2.5 py-1 font-pixel text-xs border border-[#172554]">
+                {p1Score} PTS
+              </div>
+              {p1Streak > 1 && (
+                <span className="bg-[#f59e0b] text-white px-1.5 py-0.5 font-pixel text-[9px] animate-pulse">
+                  {p1Streak}x Streak!
+                </span>
+              )}
+            </div>
           </div>
 
-          <div>
-            <span className="text-xs font-bold text-[#b45309] block">
-              Two-Player Split Screen Battle Concluded!
+          {/* Question Text */}
+          <div className="pixel-parchment p-3 bg-white min-h-[90px] flex flex-col justify-center">
+            <span className="font-pixel text-[9px] text-[#1e40af] mb-1">
+              Question {qIndex + 1}:
             </span>
-            <h2 className="text-xl sm:text-2xl font-bold text-[#4a2800] mt-1">
-              {getWinner()}
-            </h2>
-            <p className="text-xs sm:text-sm text-[#78350f] mt-1">
-              Both farmers solved {levelDef.name} together with instant tap choices!
+            <p className="text-sm sm:text-base font-bold text-[#1e293b] leading-snug">
+              {currentQ.prompt}
             </p>
           </div>
 
-          {/* Comparison Scoreboard Grid */}
-          <div className="grid grid-cols-2 gap-4 w-full">
-            {/* Player 1 Card */}
-            <div
-              className={`p-4 border-3 flex flex-col items-center gap-2 ${
-                p1Score >= p2Score
-                  ? 'bg-[#dbeafe] border-[#1d4ed8] shadow-md'
-                  : 'bg-[#f1f5f9] border-[#cbd5e1]'
-              }`}
-            >
-              <PixelSprite name="player1" size={40} />
-              <span className="font-bold text-xs text-[#1e3a8a]">Player 1 (Blue)</span>
-              <div className="font-pixel text-xl text-[#1e40af]">{p1Score} pts</div>
-              <span className="text-xs text-[#2563eb]">
-                {p1CorrectCount} / {questions.length} correct
-              </span>
-              {p1Score >= p2Score && (
-                <span className="text-[11px] font-bold bg-[#fef08a] text-[#854d0e] px-2 py-0.5 border border-[#ca8a04]">
-                  {p1Score > p2Score ? 'Gold Medalist' : 'Co-Champion'}
-                </span>
-              )}
-            </div>
+          {/* Player 1 Options */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
+            {currentQ.options.map((opt, oIdx) => {
+              const isSelected = p1SelectedKey === opt.key;
+              const isCorrectChoice = opt.key === currentQ.correctKey;
+              const keyHint = ['Q', 'W', 'E', 'R'][oIdx] || '';
 
-            {/* Player 2 Card */}
-            <div
-              className={`p-4 border-3 flex flex-col items-center gap-2 ${
-                p2Score >= p1Score
-                  ? 'bg-[#dcfce7] border-[#15803d] shadow-md'
-                  : 'bg-[#f1f5f9] border-[#cbd5e1]'
-              }`}
-            >
-              <PixelSprite name="player2" size={40} />
-              <span className="font-bold text-xs text-[#14532d]">Player 2 (Green)</span>
-              <div className="font-pixel text-xl text-[#15803d]">{p2Score} pts</div>
-              <span className="text-xs text-[#16a34a]">
-                {p2CorrectCount} / {questions.length} correct
-              </span>
-              {p2Score >= p1Score && (
-                <span className="text-[11px] font-bold bg-[#fef08a] text-[#854d0e] px-2 py-0.5 border border-[#ca8a04]">
-                  {p2Score > p1Score ? 'Gold Medalist' : 'Co-Champion'}
-                </span>
-              )}
-            </div>
+              let btnStyle =
+                'bg-white border-[#3b82f6] text-[#1e293b] hover:bg-[#dbeafe] active:scale-95';
+
+              if (isSelected) {
+                btnStyle = 'bg-[#1e40af] text-white border-[#172554] ring-2 ring-[#60a5fa]';
+              }
+
+              if (bothSubmitted) {
+                if (isCorrectChoice) {
+                  btnStyle = 'bg-[#16a34a] text-white border-[#14532d] font-bold';
+                } else if (isSelected && !isCorrectChoice) {
+                  btnStyle = 'bg-[#dc2626] text-white border-[#7f1d1d] opacity-80';
+                } else {
+                  btnStyle = 'bg-stone-100 text-stone-400 border-stone-300 opacity-40';
+                }
+              }
+
+              return (
+                <button
+                  key={opt.key}
+                  type="button"
+                  disabled={p1Submitted}
+                  onClick={() => handleP1Tap(opt.key)}
+                  className={`p-2.5 border-2 flex items-center justify-between text-left cursor-pointer transition-all ${btnStyle}`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="w-5 h-5 rounded bg-blue-100 text-blue-900 font-pixel text-[10px] flex items-center justify-center font-bold shrink-0">
+                      {opt.key}
+                    </span>
+                    <span className="text-xs sm:text-sm font-bold">{opt.text}</span>
+                  </div>
+                  <span className="text-[9px] font-mono opacity-60 hidden sm:inline">
+                    [{keyHint}]
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
-          {/* Action buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md pt-2">
-            <button
-              onClick={() => {
-                soundManager.playClick();
-                setQIndex(0);
-                setP1Score(0);
-                setP2Score(0);
-                setP1CorrectCount(0);
-                setP2CorrectCount(0);
-                setP1SelectedKey(null);
-                setP2SelectedKey(null);
-                setP1Submitted(false);
-                setP2Submitted(false);
-                setP1IsCorrect(null);
-                setP2IsCorrect(null);
-                setP1Timer(0);
-                setP2Timer(0);
-                setIsGameOver(false);
-              }}
-              className="pixel-btn-blue flex-1 py-2.5 font-bold text-xs cursor-pointer"
-            >
-              Rematch Battle
-            </button>
-
-            <button
-              onClick={() => {
-                soundManager.playClick();
-                const combinedScore = Math.max(p1Score, p2Score);
-                const stars = combinedScore >= 50 ? 3 : combinedScore >= 30 ? 2 : 1;
-                onFinishLevel(stars, combinedScore);
-              }}
-              className="pixel-btn-gold flex-1 py-2.5 font-bold text-xs cursor-pointer"
-            >
-              Save & Return
-            </button>
+          {/* Status Bar */}
+          <div className="mt-auto pt-2 flex items-center justify-between text-xs">
+            {p1Submitted && !bothSubmitted && (
+              <span className="font-pixel text-[10px] text-[#1e40af] animate-pulse">
+                ✓ Locked in! Waiting for Player 2...
+              </span>
+            )}
+            {bothSubmitted && (
+              <div className="flex items-center gap-2">
+                <PixelSprite name={p1IsCorrect ? 'check' : 'cross'} size={18} />
+                <span
+                  className={`font-pixel text-[11px] ${
+                    p1IsCorrect ? 'text-[#16a34a]' : 'text-[#dc2626]'
+                  }`}
+                >
+                  {p1IsCorrect ? '+10' : '+0'}
+                  {p1SpeedBonus ? ' (+5 Speed Bonus!)' : ''}
+                </span>
+              </div>
+            )}
+            <span className="font-mono text-[11px] text-[#64748b]">⏱️ {p1Timer}s</span>
           </div>
         </div>
-      )}
+
+        {/* ==================== PLAYER 2 (RIGHT / GOLD) ==================== */}
+        <div className="pixel-wood-box p-3 sm:p-4 flex flex-col gap-3 border-4 border-[#b45309] bg-[#fffbeb]">
+          {/* Header */}
+          <div className="flex items-center justify-between pb-2 border-b-2 border-[#fde68a]">
+            <div className="flex items-center gap-2">
+              <PixelSprite name="player2" size={32} animate={p2Streak > 1} />
+              <div>
+                <span className="font-pixel text-xs text-[#b45309] font-bold block">
+                  Player 2 (Gold)
+                </span>
+                <span className="text-[10px] text-[#d97706] font-semibold">
+                  Keys: U, I, O, P / Tap
+                </span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <div className="bg-[#b45309] text-white px-2.5 py-1 font-pixel text-xs border border-[#78350f]">
+                {p2Score} PTS
+              </div>
+              {p2Streak > 1 && (
+                <span className="bg-[#f59e0b] text-white px-1.5 py-0.5 font-pixel text-[9px] animate-pulse">
+                  {p2Streak}x Streak!
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Question Text */}
+          <div className="pixel-parchment p-3 bg-white min-h-[90px] flex flex-col justify-center">
+            <span className="font-pixel text-[9px] text-[#b45309] mb-1">
+              Question {qIndex + 1}:
+            </span>
+            <p className="text-sm sm:text-base font-bold text-[#1e293b] leading-snug">
+              {currentQ.prompt}
+            </p>
+          </div>
+
+          {/* Player 2 Options */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1">
+            {currentQ.options.map((opt, oIdx) => {
+              const isSelected = p2SelectedKey === opt.key;
+              const isCorrectChoice = opt.key === currentQ.correctKey;
+              const keyHint = ['U', 'I', 'O', 'P'][oIdx] || '';
+
+              let btnStyle =
+                'bg-white border-[#f59e0b] text-[#1e293b] hover:bg-[#fef3c7] active:scale-95';
+
+              if (isSelected) {
+                btnStyle = 'bg-[#b45309] text-white border-[#78350f] ring-2 ring-[#fbbf24]';
+              }
+
+              if (bothSubmitted) {
+                if (isCorrectChoice) {
+                  btnStyle = 'bg-[#16a34a] text-white border-[#14532d] font-bold';
+                } else if (isSelected && !isCorrectChoice) {
+                  btnStyle = 'bg-[#dc2626] text-white border-[#7f1d1d] opacity-80';
+                } else {
+                  btnStyle = 'bg-stone-100 text-stone-400 border-stone-300 opacity-40';
+                }
+              }
+
+              return (
+                <button
+                  key={opt.key}
+                  type="button"
+                  disabled={p2Submitted}
+                  onClick={() => handleP2Tap(opt.key)}
+                  className={`p-2.5 border-2 flex items-center justify-between text-left cursor-pointer transition-all ${btnStyle}`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="w-5 h-5 rounded bg-amber-100 text-amber-900 font-pixel text-[10px] flex items-center justify-center font-bold shrink-0">
+                      {opt.key}
+                    </span>
+                    <span className="text-xs sm:text-sm font-bold">{opt.text}</span>
+                  </div>
+                  <span className="text-[9px] font-mono opacity-60 hidden sm:inline">
+                    [{keyHint}]
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Status Bar */}
+          <div className="mt-auto pt-2 flex items-center justify-between text-xs">
+            {p2Submitted && !bothSubmitted && (
+              <span className="font-pixel text-[10px] text-[#b45309] animate-pulse">
+                ✓ Locked in! Waiting for Player 1...
+              </span>
+            )}
+            {bothSubmitted && (
+              <div className="flex items-center gap-2">
+                <PixelSprite name={p2IsCorrect ? 'check' : 'cross'} size={18} />
+                <span
+                  className={`font-pixel text-[11px] ${
+                    p2IsCorrect ? 'text-[#16a34a]' : 'text-[#dc2626]'
+                  }`}
+                >
+                  {p2IsCorrect ? '+10' : '+0'}
+                  {p2SpeedBonus ? ' (+5 Speed Bonus!)' : ''}
+                </span>
+              </div>
+            )}
+            <span className="font-mono text-[11px] text-[#64748b]">⏱️ {p2Timer}s</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Control Bar */}
+      <div className="pixel-wood-box p-3 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleJumpToPrevSection}
+            disabled={currentSectionIndex === 0}
+            className={`px-3 py-1.5 text-xs font-pixel border cursor-pointer ${
+              currentSectionIndex === 0
+                ? 'bg-stone-300 text-stone-500 border-stone-400 opacity-50 cursor-not-allowed'
+                : 'pixel-btn-blue'
+            }`}
+          >
+            ⬅ Previous Level
+          </button>
+
+          <button
+            onClick={handleJumpToNextSection}
+            className="pixel-btn-gold px-3 py-1.5 text-xs font-pixel cursor-pointer"
+          >
+            Skip / Next Level ➔
+          </button>
+        </div>
+
+        {/* Advance Round Button */}
+        <div>
+          {bothSubmitted && (
+            <button
+              onClick={handleNextTogether}
+              className="pixel-btn-green px-6 py-2 font-pixel text-xs sm:text-sm cursor-pointer shadow-lg animate-bounce"
+            >
+              {qIndex + 1 < questions.length ? 'Next Question ➔' : 'View Winner 🏆'}
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

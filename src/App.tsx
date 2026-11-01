@@ -247,6 +247,7 @@ export default function App() {
             userData={userData}
             onFinishLevel={handleFinishLevel}
             onExit={() => setCurrentView('MAP')}
+            onChangeSection={(newSec) => setActiveSection(newSec)}
           />
         )}
 
@@ -256,6 +257,7 @@ export default function App() {
             userData={userData}
             onFinishLevel={handleFinishLevel}
             onExit={() => setCurrentView('MAP')}
+            onChangeSection={(newSec) => setActiveSection(newSec)}
           />
         )}
 
@@ -272,7 +274,7 @@ export default function App() {
       <footer className="w-full bg-[#1b281c] border-t-2 border-[#121c13] py-3 px-4 text-center text-xs text-[#a3b899] z-20">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>Stardew Valley English Adventure · Primary 5 Curriculum</span>
-          <span>Preserves Sections A, B, D, E, G, H, I, K · Single & 2-Player Split Screen</span>
+          <span>Sections A, B, E, F, G, H, I, K · Single & Synchronous 2-Player Split Screen PK</span>
         </div>
       </footer>
     </div>

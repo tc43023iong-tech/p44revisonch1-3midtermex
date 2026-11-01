@@ -2,11 +2,12 @@ import { SectionId } from '../types/game';
 import {
   SECTION_A_DATA,
   SECTION_B_DATA,
-  SECTION_D_DATA,
   SECTION_E_DATA,
+  SECTION_F_DATA,
   SECTION_G_DATA,
   SECTION_H_DATA,
   SECTION_I_DATA,
+  SECTION_K_QUESTIONS,
 } from '../data/gameData';
 
 export interface EvaluationResult {
@@ -25,136 +26,85 @@ export const evaluateSectionAnswer = (
 
   switch (sectionId) {
     case 'A': {
-      const q = SECTION_A_DATA.questions[questionIndex];
-      isCorrect = playerAnswer === q.correctKey;
+      const verb = SECTION_A_DATA[questionIndex];
+      if (!verb) break;
+      const ans = playerAnswer || { past: '', pastParticiple: '', presentParticiple: '' };
+      const pastOk = (ans.past || '').trim().toLowerCase() === verb.past.toLowerCase();
+      const ppOk = (ans.pastParticiple || '').trim().toLowerCase() === verb.pastParticiple.toLowerCase();
+      const prpOk = (ans.presentParticiple || '').trim().toLowerCase() === verb.presentParticiple.toLowerCase();
+      isCorrect = pastOk && ppOk && prpOk;
       break;
     }
 
     case 'B': {
       const item = SECTION_B_DATA[questionIndex];
+      if (!item) break;
       const normalized = (playerAnswer || '').trim().toLowerCase();
       isCorrect = item.acceptedAnswers.some((ans) => ans.toLowerCase() === normalized);
       break;
     }
 
-    case 'D': {
-      const item = SECTION_D_DATA[questionIndex];
-      const normalized = (playerAnswer || '')
-        .trim()
-        .toLowerCase()
-        .replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, '')
-        .replace(/\s+/g, ' ');
-
-      isCorrect = item.acceptableMatches.some((match) => {
-        const normMatch = match
-          .toLowerCase()
-          .replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, '')
-          .replace(/\s+/g, ' ');
-        return normalized === normMatch;
-      });
-
-      // Flexible check: must contain "who" and key words
-      if (!isCorrect && normalized.includes('who')) {
-        if (questionIndex === 0 && normalized.includes('crying') && normalized.includes('ben')) {
-          isCorrect = true;
-        } else if (
-          questionIndex === 1 &&
-          normalized.includes('blue dress') &&
-          normalized.includes('lucy')
-        ) {
-          isCorrect = true;
-        } else if (
-          questionIndex === 2 &&
-          normalized.includes('tall') &&
-          normalized.includes('strong') &&
-          normalized.includes('chan')
-        ) {
-          isCorrect = true;
-        }
-      }
+    case 'E': {
+      const item = SECTION_E_DATA[questionIndex];
+      if (!item) break;
+      const normalized = (playerAnswer || '').trim().toUpperCase();
+      isCorrect = normalized === item.correctFoodKey.toUpperCase() ||
+        (playerAnswer || '').trim().toLowerCase() === item.correctFoodText.toLowerCase();
       break;
     }
 
-    case 'E': {
-      const item = SECTION_E_DATA[questionIndex];
-      isCorrect = (playerAnswer || '').toLowerCase() === item.answer;
+    case 'F': {
+      const item = SECTION_F_DATA[questionIndex];
+      if (!item) break;
+      const normalized = (playerAnswer || '').trim().toUpperCase();
+      isCorrect = normalized === item.correctKey.toUpperCase();
       break;
     }
 
     case 'G': {
       const item = SECTION_G_DATA[questionIndex];
-      const ans = playerAnswer || { past: '', pastParticiple: '', presentParticiple: '' };
-      const pastOk = (ans.past || '').trim().toLowerCase() === item.past.toLowerCase();
-      const ppOk = (ans.pastParticiple || '').trim().toLowerCase() === item.pastParticiple.toLowerCase();
-      const prpOk = (ans.presentParticiple || '').trim().toLowerCase() === item.presentParticiple.toLowerCase();
-      // Partial or full credit: full 10 if all 3, or prorated
-      isCorrect = pastOk && ppOk && prpOk;
+      if (!item) break;
+      const normalized = (playerAnswer || '').trim().toLowerCase();
+      isCorrect = item.acceptedAnswers.some((ans) => ans.toLowerCase() === normalized);
       break;
     }
 
     case 'H': {
-      // Whole exercise submitted
-      const answersMap = playerAnswer || {};
-      let correctCount = 0;
-      SECTION_H_DATA.forEach((q) => {
-        if ((answersMap[q.id] || '').toLowerCase() === q.answer.toLowerCase()) {
-          correctCount++;
-        }
-      });
-      isCorrect = correctCount === SECTION_H_DATA.length;
-      return {
-        isCorrect,
-        scoreGained: correctCount * 10,
-        details: { correctCount, total: SECTION_H_DATA.length },
-      };
-    }
-
-    case 'I': {
-      const item = SECTION_I_DATA[questionIndex];
-      const normalized = (playerAnswer || '').trim().toLowerCase();
-      if (item.type === 'EN_TO_ZH') {
-        // Traditional Chinese keyword presence
-        const matchedKeywords = item.acceptableChineseKeywords?.filter((kw) =>
-          normalized.includes(kw.toLowerCase())
-        );
-        isCorrect = (matchedKeywords?.length || 0) >= 2;
+      const item = SECTION_H_DATA[questionIndex];
+      if (!item) break;
+      const w1 = (playerAnswer?.word1 || playerAnswer || '').trim().toLowerCase();
+      const w2 = (playerAnswer?.word2 || '').trim().toLowerCase();
+      if (item.pattern === 'both_and' || item.pattern === 'either_or') {
+        const ok1 = w1 === item.expectedWord1.toLowerCase();
+        const ok2 = w2 === (item.expectedWord2 || '').toLowerCase();
+        isCorrect = ok1 && ok2;
       } else {
-        // English sentence check
-        const cleanNorm = normalized.replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, '').replace(/\s+/g, ' ');
-        isCorrect = (item.acceptableEnglishMatches || []).some((m) => {
-          const cleanM = m.replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, '').replace(/\s+/g, ' ');
-          return cleanNorm.includes(cleanM) || cleanM.includes(cleanNorm);
-        });
+        isCorrect = w1 === item.expectedWord1.toLowerCase();
       }
       break;
     }
 
-    case 'K': {
-      // Fox dialogue with 7 blanks
-      const ans = playerAnswer || {};
-      const c1 = (ans[1] || '').trim().toLowerCase() === 'noisily';
-      const c2 = (ans[2] || '').trim().toLowerCase() === 'should';
-      const c3 = (ans[3] || '').trim().toLowerCase() === 'quickly';
-      const c4 = (ans[4] || '').trim().toLowerCase() === 'carelessly';
-      const c5 = (ans[5] || '').trim().toLowerCase() === 'quietly';
-      const c6 =
-        (ans[6] || '').trim().toLowerCase() === "shouldn't" ||
-        (ans[6] || '').trim().toLowerCase() === 'should not' ||
-        (ans[6] || '').trim().toLowerCase() === 'shouldnt';
-      const c7 = (ans[7] || '').trim().toLowerCase() === 'should';
-
-      const correctList = [c1, c2, c3, c4, c5, c6, c7];
-      const correctCount = correctList.filter(Boolean).length;
-      isCorrect = correctCount >= 6; // generous threshold for overall completion
-      return {
-        isCorrect: correctCount === 7,
-        scoreGained: correctCount * 10,
-        details: { correctCount, total: 7 },
-      };
+    case 'I': {
+      const item = SECTION_I_DATA[questionIndex];
+      if (!item) break;
+      const normalized = (playerAnswer || '').trim().toLowerCase();
+      isCorrect = item.acceptedAnswers.some((ans) => ans.toLowerCase() === normalized);
+      break;
     }
+
+    case 'K': {
+      const item = SECTION_K_QUESTIONS[questionIndex];
+      if (!item) break;
+      const normalized = (playerAnswer || '').trim().toLowerCase();
+      isCorrect = item.acceptedAnswers.some((ans) => ans.toLowerCase() === normalized);
+      break;
+    }
+
+    default:
+      isCorrect = false;
   }
 
-  // Speed bonus: +5 points if answered correctly within 8 seconds
+  // Base score 10 pts, +5 fast speed bonus if answered within 8 seconds
   let scoreGained = 0;
   if (isCorrect) {
     scoreGained = 10;
@@ -163,5 +113,8 @@ export const evaluateSectionAnswer = (
     }
   }
 
-  return { isCorrect, scoreGained };
+  return {
+    isCorrect,
+    scoreGained,
+  };
 };

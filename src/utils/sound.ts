@@ -299,6 +299,10 @@ class SoundManager {
       // Catch
     }
   }
+
+  public playLevelComplete() {
+    this.playVictory();
+  }
 }
 
 export const soundManager = new SoundManager();

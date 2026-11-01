@@ -1,125 +1,111 @@
 import React from 'react';
-import { SECTION_B_DATA } from '../../data/gameData';
+import { SECTION_B_DATA, SECTION_B_WORDS } from '../../data/gameData';
 import { PixelSprite } from '../common/PixelSprite';
 
 interface SectionBViewProps {
-  questionIndex: number;
-  typedAnswer: string;
+  questionIndex: number; // 0 to 5
+  answer: string;
   onChange: (val: string) => void;
   submitted: boolean;
-  isCorrect?: boolean | null;
   playerTheme?: 'blue' | 'green';
 }
 
 export const SectionBView: React.FC<SectionBViewProps> = ({
   questionIndex,
-  typedAnswer,
+  answer,
   onChange,
   submitted,
-  isCorrect,
   playerTheme = 'blue',
 }) => {
-  const item = SECTION_B_DATA[questionIndex];
-
-  // Helper to highlight the incorrect word in the sentence
-  const renderSentenceWithHighlight = () => {
-    if (!submitted) {
-      return item.sentence;
-    }
-    const regex = new RegExp(`\\b(${item.errorWord})\\b`, 'i');
-    const parts = item.sentence.split(regex);
-    return (
-      <span>
-        {parts.map((part, i) =>
-          part.toLowerCase() === item.errorWord.toLowerCase() ? (
-            <span
-              key={i}
-              className="bg-[#fecaca] text-[#991b1b] line-through px-1 font-bold rounded-xs border border-[#dc2626]"
-            >
-              {part}
-            </span>
-          ) : (
-            <span key={i}>{part}</span>
-          )
-        )}
-      </span>
-    );
-  };
+  const currentQ = SECTION_B_DATA[questionIndex] || SECTION_B_DATA[0];
+  const isCorrect = currentQ.acceptedAnswers.some(
+    (ans) => ans.toLowerCase() === (answer || '').trim().toLowerCase()
+  );
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* Wood Carpenter Board with the sentence */}
-      <div className="pixel-parchment p-3 sm:p-4">
-        <span className="font-pixel text-[9px] text-[#8b5a2b] uppercase block mb-1">
-          Blueprint Sentence {questionIndex + 1} of {SECTION_B_DATA.length}:
-        </span>
-        <p className="text-sm sm:text-base font-bold text-[#381a00] leading-relaxed">
-          "{renderSentenceWithHighlight()}"
-        </p>
+    <div className="flex flex-col gap-4">
+      {/* Word Bank at the top */}
+      <div className="pixel-parchment p-3.5">
+        <div className="flex items-center justify-between mb-2">
+          <span className="font-pixel text-[10px] text-[#78350f] uppercase">
+            Chapter 3 Word Bank (Tap a word to insert):
+          </span>
+          <span className="text-xs text-[#8b5a2b] font-semibold">
+            Question {questionIndex + 1} of {SECTION_B_DATA.length}
+          </span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {SECTION_B_WORDS.map((w) => {
+            const isSelected = answer.trim().toLowerCase() === w.toLowerCase();
+            return (
+              <button
+                key={w}
+                type="button"
+                disabled={submitted}
+                onClick={() => onChange(w)}
+                className={`px-3 py-1.5 text-xs sm:text-sm font-bold border-2 transition-transform cursor-pointer active:scale-95 ${
+                  isSelected
+                    ? 'bg-[#3b82f6] text-white border-[#1d4ed8] shadow'
+                    : 'bg-[#fffaf0] text-[#451a03] border-[#92400e] hover:bg-[#fed7aa]'
+                }`}
+              >
+                {w}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="bg-[#fff9ed] p-2.5 border border-[#c28410] text-xs text-[#5c3708]">
-        Hint: Find the one grammatically incorrect word and type its correct replacement below.
-      </div>
+      {/* Question Card with Cute Illustration */}
+      <div className="pixel-parchment p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-4">
+        <div className="w-20 h-20 bg-[#fef3c7] border-3 border-[#8b5a2b] flex items-center justify-center shrink-0 shadow">
+          <PixelSprite name={currentQ.spriteName} size={52} animate={submitted && isCorrect} />
+        </div>
 
-      {/* Answer Input Box */}
-      <div className="flex flex-col gap-1.5">
-        <label className="font-pixel text-[9px] text-[#78350f] uppercase">
-          Type the correct word:
-        </label>
-        <div className="relative">
-          <input
-            type="text"
-            disabled={submitted}
-            value={typedAnswer}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder="Type correct word here..."
-            className={`w-full px-3 py-2.5 text-sm sm:text-base border-2 font-medium outline-hidden transition-all ${
-              playerTheme === 'blue'
-                ? 'focus:border-[#2563eb] focus:bg-[#eff6ff]'
-                : 'focus:border-[#16a34a] focus:bg-[#f0fdf4]'
-            } ${
-              submitted
-                ? isCorrect
-                  ? 'bg-[#dcfce7] border-[#16a34a] text-[#14532d]'
-                  : 'bg-[#fee2e2] border-[#dc2626] text-[#991b1b]'
-                : 'bg-white border-[#8b5a2b] text-[#2b2b2b]'
-            }`}
-          />
+        <div className="flex-1 w-full">
+          <div className="mb-2">
+            <span className="font-pixel text-[10px] text-[#8b5a2b]">Sentence {questionIndex + 1}:</span>
+          </div>
+
+          <div className="text-sm sm:text-base font-semibold text-[#291807] leading-relaxed">
+            {currentQ.sentenceBefore}{' '}
+            <span className="inline-block relative min-w-[130px]">
+              <input
+                type="text"
+                disabled={submitted}
+                placeholder="type or tap word"
+                value={answer}
+                onChange={(e) => onChange(e.target.value)}
+                className={`px-2.5 py-1 text-sm sm:text-base font-bold text-center border-b-3 focus:outline-none ${
+                  submitted
+                    ? isCorrect
+                      ? 'bg-[#dcfce7] border-[#16a34a] text-[#166534]'
+                      : 'bg-[#fee2e2] border-[#dc2626] text-[#991b1b]'
+                    : 'bg-[#fffdf5] border-[#b45309] text-[#1e3a8a] focus:border-[#2563eb]'
+                }`}
+                autoComplete="off"
+                spellCheck="false"
+              />
+            </span>{' '}
+            {currentQ.sentenceAfter}
+          </div>
+
           {submitted && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-              <PixelSprite name={isCorrect ? 'check' : 'cross'} size={20} />
+            <div className="mt-3 flex items-center gap-2">
+              <PixelSprite name={isCorrect ? 'check' : 'cross'} size={18} />
+              <span
+                className={`text-xs font-bold ${
+                  isCorrect ? 'text-[#16a34a]' : 'text-[#dc2626]'
+                }`}
+              >
+                {isCorrect
+                  ? 'Excellent! Correct vocabulary word.'
+                  : `Answer: ${currentQ.correctWord}`}
+              </span>
             </div>
           )}
         </div>
       </div>
-
-      {/* Result feedback and corrected sentence */}
-      {submitted && (
-        <div
-          className={`p-3 border-2 text-xs flex flex-col gap-1.5 ${
-            isCorrect
-              ? 'bg-[#dcfce7] border-[#16a34a] text-[#14532d]'
-              : 'bg-[#fff1f2] border-[#e11d48] text-[#881337]'
-          }`}
-        >
-          <div className="font-bold flex items-center gap-1.5">
-            <PixelSprite name={isCorrect ? 'check' : 'cross'} size={14} />
-            <span>
-              {isCorrect ? 'Well crafted!' : 'Blueprints corrected!'} Mistake:{' '}
-              <span className="line-through">{item.errorWord}</span> →{' '}
-              <span className="font-extrabold underline">{item.correctWord}</span>
-            </span>
-          </div>
-          <div>
-            <span className="font-semibold">Corrected Sentence: </span>
-            <span className="italic font-medium">"{item.correctedSentence}"</span>
-          </div>
-          <div className="text-[11px] opacity-90 mt-0.5">
-            Rule: {item.ruleExplanation}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -6,21 +6,24 @@ import { GameAtmosphere } from '../common/GameAtmosphere';
 import { soundManager } from '../../utils/sound';
 import { evaluateSectionAnswer } from '../../utils/answerChecker';
 
-// Section Views
-import { SectionAView } from '../sections/SectionAView';
+// 8 Section Views
+import { SectionAView, VerbAnswers } from '../sections/SectionAView';
 import { SectionBView } from '../sections/SectionBView';
-import { SectionDView } from '../sections/SectionDView';
 import { SectionEView } from '../sections/SectionEView';
+import { SectionFView } from '../sections/SectionFView';
 import { SectionGView } from '../sections/SectionGView';
-import { SectionHView } from '../sections/SectionHView';
+import { SectionHView, ConjunctionAnswer } from '../sections/SectionHView';
 import { SectionIView } from '../sections/SectionIView';
-import { SectionKView, SectionKAnswers } from '../sections/SectionKView';
+import { SectionKView } from '../sections/SectionKView';
+
+export const ALL_SECTIONS: SectionId[] = ['A', 'B', 'E', 'F', 'G', 'H', 'I', 'K'];
 
 interface SinglePlayerGameProps {
   sectionId: SectionId;
   userData: UserSavedData;
   onFinishLevel: (stars: number, scoreGained: number) => void;
   onExit: () => void;
+  onChangeSection?: (newSectionId: SectionId) => void;
 }
 
 export const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
@@ -28,8 +31,12 @@ export const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   userData,
   onFinishLevel,
   onExit,
+  onChangeSection,
 }) => {
-  const levelDef = LEVEL_DEFINITIONS[sectionId];
+  const levelDef = LEVEL_DEFINITIONS[sectionId] || LEVEL_DEFINITIONS['A'];
+  const totalQuestions = levelDef.totalQuestions;
+  const currentSectionIndex = ALL_SECTIONS.indexOf(sectionId);
+
   const [qIndex, setQIndex] = useState(0);
 
   // Score & status
@@ -39,31 +46,49 @@ export const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [lastScoreGained, setLastScoreGained] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
+  const [showParticleBurst, setShowParticleBurst] = useState(false);
 
   // Timer
   const [timerSeconds, setTimerSeconds] = useState(0);
 
   // Independent question answers
-  const [answerA, setAnswerA] = useState<string | null>(null);
-  const [answerB, setAnswerB] = useState<string>('');
-  const [answerD, setAnswerD] = useState<string>('');
-  const [answerE, setAnswerE] = useState<'in' | 'with' | null>(null);
-  const [answerG, setAnswerG] = useState<{ past: string; pastParticiple: string; presentParticiple: string }>({
+  const [answerA, setAnswerA] = useState<VerbAnswers>({
     past: '',
     pastParticiple: '',
     presentParticiple: '',
   });
-  const [answerH, setAnswerH] = useState<Record<number, string>>({});
+  const [answerB, setAnswerB] = useState<string>('');
+  const [answerE, setAnswerE] = useState<string | null>(null);
+  const [answerF, setAnswerF] = useState<'A' | 'B' | null>(null);
+  const [answerG, setAnswerG] = useState<string>('');
+  const [answerH, setAnswerH] = useState<ConjunctionAnswer>({ word1: '', word2: '' });
   const [answerI, setAnswerI] = useState<string>('');
-  const [answerK, setAnswerK] = useState<SectionKAnswers>({
-    1: '',
-    2: '',
-    3: '',
-    4: '',
-    5: '',
-    6: '',
-    7: '',
-  });
+  const [answerK, setAnswerK] = useState<string>('');
+
+  // Reset when level or question changes
+  useEffect(() => {
+    setQIndex(0);
+    setScore(0);
+    setCorrectCount(0);
+    setIsGameOver(false);
+    resetQuestionState();
+  }, [sectionId]);
+
+  const resetQuestionState = () => {
+    setIsSubmitted(false);
+    setIsCorrect(null);
+    setTimerSeconds(0);
+    setLastScoreGained(0);
+    setShowParticleBurst(false);
+    setAnswerA({ past: '', pastParticiple: '', presentParticiple: '' });
+    setAnswerB('');
+    setAnswerE(null);
+    setAnswerF(null);
+    setAnswerG('');
+    setAnswerH({ word1: '', word2: '' });
+    setAnswerI('');
+    setAnswerK('');
+  };
 
   // Timer loop
   useEffect(() => {
@@ -74,436 +99,408 @@ export const SinglePlayerGame: React.FC<SinglePlayerGameProps> = ({
     return () => clearInterval(interval);
   }, [isSubmitted, isGameOver]);
 
-  // Reset inputs when question index changes
-  const resetQuestionInputs = () => {
-    setIsSubmitted(false);
-    setIsCorrect(null);
-    setTimerSeconds(0);
-    setLastScoreGained(0);
-    setAnswerA(null);
-    setAnswerB('');
-    setAnswerD('');
-    setAnswerE(null);
-    setAnswerG({ past: '', pastParticiple: '', presentParticiple: '' });
-    setAnswerI('');
+  // Current answer value based on active section
+  const getCurrentAnswerValue = () => {
+    switch (sectionId) {
+      case 'A':
+        return answerA;
+      case 'B':
+        return answerB;
+      case 'E':
+        return answerE;
+      case 'F':
+        return answerF;
+      case 'G':
+        return answerG;
+      case 'H':
+        return answerH;
+      case 'I':
+        return answerI;
+      case 'K':
+        return answerK;
+      default:
+        return null;
+    }
   };
 
-  // Instant evaluation handler (NO separate submit button!)
-  const triggerInstantEvaluation = (providedAnswer: any) => {
+  // Check if current question has an input provided
+  const hasProvidedInput = () => {
+    switch (sectionId) {
+      case 'A':
+        return !!(answerA.past || answerA.pastParticiple || answerA.presentParticiple);
+      case 'B':
+        return !!answerB.trim();
+      case 'E':
+        return !!answerE;
+      case 'F':
+        return !!answerF;
+      case 'G':
+        return !!answerG.trim();
+      case 'H':
+        return !!answerH.word1.trim();
+      case 'I':
+        return !!answerI.trim();
+      case 'K':
+        return !!answerK.trim();
+      default:
+        return false;
+    }
+  };
+
+  // Evaluation Handler
+  const handleSubmitCurrentAnswer = (providedOverride?: any) => {
     if (isSubmitted) return;
-    const result = evaluateSectionAnswer(sectionId, qIndex, providedAnswer, timerSeconds);
+    const ans = providedOverride !== undefined ? providedOverride : getCurrentAnswerValue();
+    const result = evaluateSectionAnswer(sectionId, qIndex, ans, timerSeconds);
 
     setIsSubmitted(true);
     setIsCorrect(result.isCorrect);
     setLastScoreGained(result.scoreGained);
-    setScore((prev) => prev + result.scoreGained);
 
     if (result.isCorrect) {
       soundManager.playCorrect();
+      setScore((prev) => prev + result.scoreGained);
       setCorrectCount((prev) => prev + 1);
+      setShowParticleBurst(true);
+      setTimeout(() => setShowParticleBurst(false), 1800);
     } else {
       soundManager.playIncorrect();
     }
   };
 
-  // Instant Tap for Section A
-  const handleSelectA = (key: string) => {
-    if (isSubmitted) return;
+  // Move to next question or complete level
+  const handleNextQuestion = () => {
     soundManager.playClick();
-    setAnswerA(key);
-    triggerInstantEvaluation(key);
-  };
-
-  // Instant Tap for Section E
-  const handleSelectE = (choice: 'in' | 'with') => {
-    if (isSubmitted) return;
-    soundManager.playClick();
-    setAnswerE(choice);
-    triggerInstantEvaluation(choice);
-  };
-
-  const handleNext = () => {
-    soundManager.playClick();
-    // Sections H and K are full-screen single-stage exercises
-    if (sectionId === 'H' || sectionId === 'K') {
-      setIsGameOver(true);
-      soundManager.playVictory();
-      return;
-    }
-
-    if (qIndex + 1 < levelDef.totalQuestions) {
+    if (qIndex + 1 < totalQuestions) {
       setQIndex((prev) => prev + 1);
-      resetQuestionInputs();
+      resetQuestionState();
     } else {
-      setIsGameOver(true);
-      soundManager.playVictory();
+      handleCompleteLevel();
     }
   };
 
-  // Calculate final stars
-  const calculateStars = () => {
-    const totalQ = sectionId === 'H' ? 6 : sectionId === 'K' ? 7 : levelDef.totalQuestions;
-    const finalCorrect = sectionId === 'H' || sectionId === 'K' ? Math.round(score / 10) : correctCount;
-    const ratio = finalCorrect / totalQ;
-    if (ratio >= 0.85) return 3;
-    if (ratio >= 0.6) return 2;
-    if (ratio >= 0.3) return 1;
-    return 0;
-  };
+  const handleCompleteLevel = () => {
+    let stars = 1;
+    const ratio = correctCount / totalQuestions;
+    if (ratio >= 0.85) stars = 3;
+    else if (ratio >= 0.5) stars = 2;
 
-  const handleFinishAndSave = () => {
-    const stars = calculateStars();
+    soundManager.playLevelComplete();
+    setIsGameOver(true);
     onFinishLevel(stars, score);
   };
 
-  return (
-    <div className="w-full max-w-5xl mx-auto px-3 sm:px-4 py-4 flex flex-col gap-4">
-      {/* Top HUD Bar */}
-      <div className="pixel-wood-box p-3 flex items-center justify-between gap-3">
-        {/* Left: Section & Character info */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-[#faeed1] border-2 border-[#7c4f24] flex items-center justify-center shrink-0">
-            <PixelSprite name={levelDef.character.avatarType} size={30} />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-xs text-[#b45309]">
-                {levelDef.sectionCode}
-              </span>
-              <span className="text-xs text-[#78350f] font-medium hidden sm:inline">·</span>
-              <span className="font-bold text-xs text-[#4a2e13]">
-                {levelDef.name}
-              </span>
-            </div>
-            <p className="text-xs font-semibold text-[#854d0e]">
-              {levelDef.subtitle}
-            </p>
-          </div>
-        </div>
+  // Skip / Jump to Next Section even if not finished
+  const handleJumpToNextSection = () => {
+    soundManager.playClick();
+    if (currentSectionIndex < ALL_SECTIONS.length - 1) {
+      const nextSec = ALL_SECTIONS[currentSectionIndex + 1];
+      if (onChangeSection) onChangeSection(nextSec);
+    } else {
+      // Loop back or exit to map
+      onExit();
+    }
+  };
 
-        {/* Right: Score, Timer & Exit Button */}
-        <div className="flex items-center gap-3 sm:gap-4 text-xs font-semibold">
-          <div className="flex items-center gap-1.5 bg-[#ecd4a4] px-2.5 py-1 border border-[#8b5a2b]">
-            <PixelSprite name="coin_gold" size={16} />
-            <span className="font-bold text-xs text-[#4a2800]">{score} pts</span>
-          </div>
+  const handleJumpToPrevSection = () => {
+    soundManager.playClick();
+    if (currentSectionIndex > 0) {
+      const prevSec = ALL_SECTIONS[currentSectionIndex - 1];
+      if (onChangeSection) onChangeSection(prevSec);
+    } else {
+      onExit();
+    }
+  };
 
-          <div className="hidden sm:flex items-center gap-1 bg-[#ecd4a4] px-2.5 py-1 border border-[#8b5a2b]">
-            <span className="font-bold text-xs text-[#5c3708]">{timerSeconds}s</span>
-          </div>
-
-          <button
-            onClick={() => {
-              soundManager.playClick();
-              onExit();
+  // Render active section component
+  const renderSectionBody = () => {
+    switch (sectionId) {
+      case 'A':
+        return (
+          <SectionAView
+            questionIndex={qIndex}
+            answers={answerA}
+            onChange={(field, val) => setAnswerA((prev) => ({ ...prev, [field]: val }))}
+            submitted={isSubmitted}
+            playerTheme="blue"
+            onJumpToVerb={(idx) => {
+              setQIndex(idx);
+              resetQuestionState();
             }}
-            className="text-xs font-semibold text-[#854d0e] hover:text-[#4a2800] underline px-2 py-1 cursor-pointer"
-          >
-            Exit to map
-          </button>
-        </div>
-      </div>
+          />
+        );
 
-      {/* Rich Stardew Farm Atmosphere Header: fence, hen, rabbit, sunflowers, speech bubble */}
+      case 'B':
+        return (
+          <SectionBView
+            questionIndex={qIndex}
+            answer={answerB}
+            onChange={(val) => setAnswerB(val)}
+            submitted={isSubmitted}
+            playerTheme="blue"
+          />
+        );
+
+      case 'E':
+        return (
+          <SectionEView
+            questionIndex={qIndex}
+            selectedAnswer={answerE}
+            onSelect={(key) => {
+              setAnswerE(key);
+              if (!isSubmitted) {
+                handleSubmitCurrentAnswer(key);
+              }
+            }}
+            submitted={isSubmitted}
+            playerTheme="blue"
+          />
+        );
+
+      case 'F':
+        return (
+          <SectionFView
+            questionIndex={qIndex}
+            selectedKey={answerF}
+            onSelect={(key) => {
+              setAnswerF(key);
+              if (!isSubmitted) {
+                handleSubmitCurrentAnswer(key);
+              }
+            }}
+            submitted={isSubmitted}
+            playerTheme="blue"
+          />
+        );
+
+      case 'G':
+        return (
+          <SectionGView
+            questionIndex={qIndex}
+            answer={answerG}
+            onChange={(val) => setAnswerG(val)}
+            submitted={isSubmitted}
+            playerTheme="blue"
+          />
+        );
+
+      case 'H':
+        return (
+          <SectionHView
+            questionIndex={qIndex}
+            answer={answerH}
+            onChange={(field, val) => setAnswerH((prev) => ({ ...prev, [field]: val }))}
+            submitted={isSubmitted}
+            playerTheme="blue"
+          />
+        );
+
+      case 'I':
+        return (
+          <SectionIView
+            questionIndex={qIndex}
+            answer={answerI}
+            onChange={(val) => setAnswerI(val)}
+            submitted={isSubmitted}
+            playerTheme="blue"
+          />
+        );
+
+      case 'K':
+        return (
+          <SectionKView
+            questionIndex={qIndex}
+            answer={answerK}
+            onChange={(val) => setAnswerK(val)}
+            submitted={isSubmitted}
+            playerTheme="blue"
+          />
+        );
+
+      default:
+        return <div>Unknown Section</div>;
+    }
+  };
+
+  const levelProgressPercent = Math.round(((qIndex + (isSubmitted ? 1 : 0)) / totalQuestions) * 100);
+
+  return (
+    <div className="relative w-full max-w-5xl mx-auto px-4 py-4 flex flex-col gap-4">
+      {/* Dynamic Background Atmosphere */}
       <GameAtmosphere
         characterName={levelDef.character.name}
         characterRole={levelDef.character.role}
         avatarType={levelDef.character.avatarType}
         characterSpeech={levelDef.character.greeting}
         sectionTitle={levelDef.name}
-        subtitle={levelDef.instruction}
+        subtitle={levelDef.subtitle}
       />
 
-      {/* Progress Bar */}
-      {sectionId !== 'H' && sectionId !== 'K' && (
-        <div className="w-full bg-[#3d2511] p-1 border-2 border-[#5a3818]">
-          <div
-            className="bg-[#22c55e] h-2.5 transition-all duration-300"
-            style={{
-              width: `${((qIndex + (isSubmitted ? 1 : 0)) / levelDef.totalQuestions) * 100}%`,
-            }}
-          />
+      {/* Confetti & Particle Burst FX on Correct Answer */}
+      {showParticleBurst && (
+        <div className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center">
+          <div className="absolute top-1/3 flex flex-col items-center animate-bounce">
+            <div className="flex items-center gap-2 bg-[#f59e0b] border-4 border-[#78350f] px-5 py-2.5 shadow-2xl">
+              <PixelSprite name="star_full" size={28} className="animate-spin" />
+              <span className="font-pixel text-lg sm:text-2xl text-white drop-shadow">
+                +{lastScoreGained} PTS! EXCELLENT!
+              </span>
+              <PixelSprite name="coin_gold" size={28} />
+            </div>
+            <div className="flex gap-4 mt-2">
+              <PixelSprite name="sparkle" size={24} animate />
+              <PixelSprite name="melon" size={24} />
+              <PixelSprite name="sparkle" size={24} animate />
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Main Play Area */}
-      {!isGameOver ? (
-        <div className="pixel-wood-box p-4 sm:p-6 flex flex-col gap-4 relative overflow-hidden">
-          {/* Section Specific Interactive Component */}
-          {sectionId === 'A' && (
-            <SectionAView
-              questionIndex={qIndex}
-              selectedKey={answerA}
-              onSelect={handleSelectA}
-              submitted={isSubmitted}
-              playerTheme="blue"
-            />
-          )}
+      {/* Top Universal Control & Progress Bar */}
+      <div className="pixel-wood-box p-3 sm:p-4 flex flex-col gap-2.5 shadow-lg">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          {/* Back & Section Indicator */}
+          <div className="flex items-center gap-2.5">
+            <button
+              onClick={() => {
+                soundManager.playClick();
+                onExit();
+              }}
+              className="pixel-btn-gold px-2.5 py-1 text-xs font-pixel flex items-center gap-1 cursor-pointer"
+              title="Return to Map"
+            >
+              <span>🗺️ Map</span>
+            </button>
 
-          {sectionId === 'B' && (
-            <div className="flex flex-col gap-3">
-              <SectionBView
-                questionIndex={qIndex}
-                typedAnswer={answerB}
-                onChange={setAnswerB}
-                submitted={isSubmitted}
-                isCorrect={isCorrect}
-                playerTheme="blue"
-              />
-              {!isSubmitted && (
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    disabled={!answerB.trim()}
-                    onClick={() => triggerInstantEvaluation(answerB)}
-                    className="pixel-btn-blue px-5 py-2 text-xs font-bold cursor-pointer"
-                  >
-                    Check word →
-                  </button>
-                </div>
-              )}
+            <button
+              onClick={handleJumpToPrevSection}
+              disabled={currentSectionIndex === 0}
+              className={`px-2.5 py-1 text-xs font-pixel border cursor-pointer ${
+                currentSectionIndex === 0
+                  ? 'bg-stone-300 text-stone-500 border-stone-400 opacity-50 cursor-not-allowed'
+                  : 'pixel-btn-blue'
+              }`}
+              title="Go to Previous Level"
+            >
+              ⬅ Prev Level
+            </button>
+
+            <div>
+              <span className="font-pixel text-[10px] text-[#8b5a2b] block">
+                Level {currentSectionIndex + 1} of {ALL_SECTIONS.length}: {levelDef.sectionCode}
+              </span>
+              <h2 className="font-pixel text-xs sm:text-sm text-[#4a2800] tracking-wide font-bold">
+                {levelDef.name}
+              </h2>
             </div>
-          )}
+          </div>
 
-          {sectionId === 'D' && (
-            <div className="flex flex-col gap-3">
-              <SectionDView
-                questionIndex={qIndex}
-                typedSentence={answerD}
-                onChange={setAnswerD}
-                submitted={isSubmitted}
-                isCorrect={isCorrect}
-                playerTheme="blue"
-              />
-              {!isSubmitted && (
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    disabled={!answerD.trim()}
-                    onClick={() => triggerInstantEvaluation(answerD)}
-                    className="pixel-btn-green px-5 py-2 text-xs font-bold cursor-pointer"
-                  >
-                    Check sentence →
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {sectionId === 'E' && (
-            <SectionEView
-              questionIndex={qIndex}
-              selectedChoice={answerE}
-              onSelect={handleSelectE}
-              submitted={isSubmitted}
-              playerTheme="blue"
-            />
-          )}
-
-          {sectionId === 'G' && (
-            <div className="flex flex-col gap-3">
-              <SectionGView
-                questionIndex={qIndex}
-                answers={answerG}
-                onChange={(field, val) => setAnswerG((prev) => ({ ...prev, [field]: val }))}
-                submitted={isSubmitted}
-                playerTheme="blue"
-              />
-              {!isSubmitted && (
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    disabled={!answerG.past.trim() || !answerG.pastParticiple.trim() || !answerG.presentParticiple.trim()}
-                    onClick={() => triggerInstantEvaluation(answerG)}
-                    className="pixel-btn-gold px-5 py-2 text-xs font-bold cursor-pointer"
-                  >
-                    Harvest verb forms →
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {sectionId === 'H' && (
-            <div className="flex flex-col gap-3">
-              <SectionHView
-                answers={answerH}
-                onSetAnswer={(id, word) => {
-                  const updated = { ...answerH, [id]: word };
-                  setAnswerH(updated);
-                  if (Object.keys(updated).length === 6) {
-                    triggerInstantEvaluation(updated);
-                  }
-                }}
-                onClearAnswer={(id) =>
-                  setAnswerH((prev) => {
-                    const updated = { ...prev };
-                    delete updated[id];
-                    return updated;
-                  })
-                }
-                submitted={isSubmitted}
-                playerTheme="blue"
-              />
-            </div>
-          )}
-
-          {sectionId === 'I' && (
-            <div className="flex flex-col gap-3">
-              <SectionIView
-                questionIndex={qIndex}
-                typedTranslation={answerI}
-                onChange={setAnswerI}
-                submitted={isSubmitted}
-                isCorrect={isCorrect}
-                playerTheme="blue"
-              />
-              {!isSubmitted && (
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    disabled={!answerI.trim()}
-                    onClick={() => triggerInstantEvaluation(answerI)}
-                    className="pixel-btn-blue px-5 py-2 text-xs font-bold cursor-pointer"
-                  >
-                    Check translation →
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {sectionId === 'K' && (
-            <div className="flex flex-col gap-3">
-              <SectionKView
-                answers={answerK}
-                onChange={(idx, val) => {
-                  const updated = { ...answerK, [idx]: val };
-                  setAnswerK(updated);
-                  const filledCount = Object.values(updated).filter((v) => v.trim()).length;
-                  if (filledCount === 7) {
-                    triggerInstantEvaluation(updated);
-                  }
-                }}
-                submitted={isSubmitted}
-                playerTheme="blue"
-              />
-              {!isSubmitted && (
-                <div className="flex justify-end">
-                  <button
-                    type="button"
-                    onClick={() => triggerInstantEvaluation(answerK)}
-                    className="pixel-btn-gold px-5 py-2 text-xs font-bold cursor-pointer"
-                  >
-                    Check cottage tidy mission →
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Next Question Bar (NO submit button!) */}
-          <div className="flex items-center justify-between pt-3 border-t-2 border-[#8b5a2b] mt-2">
-            <div className="text-xs text-[#78350f] font-semibold">
-              {sectionId !== 'H' && sectionId !== 'K' ? (
-                <span>
-                  Question {qIndex + 1} of {levelDef.totalQuestions}
-                </span>
-              ) : (
-                <span>Level quest in progress</span>
-              )}
+          {/* Stats & Next Level Skip Button */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-1.5 bg-[#ecd4a4] px-2.5 py-1 border border-[#8b5a2b] font-pixel text-xs text-[#5c3708]">
+              <PixelSprite name="coin_gold" size={14} />
+              <span>{score} PTS</span>
             </div>
 
-            {/* When submitted, show Next Question button */}
-            {isSubmitted && (
-              <button
-                type="button"
-                onClick={handleNext}
-                className="pixel-btn-gold px-6 py-2.5 text-xs sm:text-sm font-bold tracking-wide cursor-pointer flex items-center gap-2 animate-in fade-in"
-              >
-                <span>
-                  {sectionId === 'H' ||
-                  sectionId === 'K' ||
-                  qIndex + 1 === levelDef.totalQuestions
-                    ? 'View Final Results →'
-                    : 'Next Question →'}
-                </span>
-                <PixelSprite name="check" size={16} />
-              </button>
-            )}
+            <div className="flex items-center gap-1.5 bg-[#ecd4a4] px-2.5 py-1 border border-[#8b5a2b] font-pixel text-xs text-[#5c3708]">
+              <PixelSprite name="star_full" size={14} />
+              <span>{correctCount}/{totalQuestions}</span>
+            </div>
+
+            {/* Guaranteed "Next Level" button available anytime even if not completed */}
+            <button
+              onClick={handleJumpToNextSection}
+              className="pixel-btn-green px-3 py-1.5 text-xs font-pixel flex items-center gap-1.5 cursor-pointer shadow animate-pulse hover:animate-none"
+              title="Skip or proceed to next level"
+            >
+              <span>Next Level ➔</span>
+            </button>
           </div>
         </div>
-      ) : (
-        /* Final Score & Victory Screen */
-        <div className="pixel-wood-box p-6 sm:p-8 flex flex-col items-center text-center gap-5 max-w-xl mx-auto w-full animate-in zoom-in-95">
-          <div className="w-16 h-16 bg-[#ffd885] border-3 border-[#8b5a2b] flex items-center justify-center p-2 shadow-md">
-            <PixelSprite name="trophy" size={44} animate={true} />
-          </div>
 
+        {/* Level Question Progress Bar */}
+        <div className="w-full flex items-center gap-3 mt-1">
+          <div className="flex-1 bg-[#4a2e13] h-3.5 border border-[#2b1807] overflow-hidden p-0.5">
+            <div
+              className="h-full bg-gradient-to-r from-[#f59e0b] to-[#10b981] transition-all duration-300 rounded-xs"
+              style={{ width: `${levelProgressPercent}%` }}
+            />
+          </div>
+          <span className="font-pixel text-[10px] text-[#78350f] shrink-0">
+            Q {qIndex + 1}/{totalQuestions} ({levelProgressPercent}%)
+          </span>
+        </div>
+      </div>
+
+      {/* Character Greeting & Mission Instruction */}
+      <div className="pixel-parchment p-3 sm:p-4 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-[#faeed1] border-2 border-[#8b5a2b] flex items-center justify-center shrink-0">
+            <PixelSprite name={levelDef.character.avatarType} size={36} />
+          </div>
           <div>
-            <span className="text-xs font-bold text-[#b45309] block">
-              Mission completed!
+            <span className="font-pixel text-[10px] text-[#8b5a2b]">
+              {levelDef.character.name} ({levelDef.character.role}):
             </span>
-            <h2 className="text-lg sm:text-xl font-bold text-[#4a2800] mt-1">
-              {levelDef.name}
-            </h2>
-            <p className="text-xs sm:text-sm text-[#78350f] mt-1">
-              You showed great English grammar and vocabulary mastery!
+            <p className="text-xs sm:text-sm font-semibold text-[#381a00] italic">
+              "{levelDef.instruction}"
             </p>
           </div>
-
-          {/* Stars Awarded */}
-          <div className="flex items-center gap-3 bg-[#ecd4a4] p-3 border-2 border-[#8b5a2b]">
-            {[1, 2, 3].map((starIdx) => (
-              <PixelSprite
-                key={starIdx}
-                name={starIdx <= calculateStars() ? 'star_full' : 'star_empty'}
-                size={32}
-                animate={starIdx <= calculateStars()}
-              />
-            ))}
-          </div>
-
-          {/* Score breakdown */}
-          <div className="grid grid-cols-2 gap-3 w-full max-w-sm">
-            <div className="bg-[#fff9ed] p-3 border border-[#b45309]">
-              <span className="text-xs text-[#854d0e] font-semibold block">Total points</span>
-              <span className="font-pixel text-base text-[#15803d]">+{score}</span>
-            </div>
-            <div className="bg-[#fff9ed] p-3 border border-[#b45309]">
-              <span className="text-xs text-[#854d0e] font-semibold block">Gold earned</span>
-              <span className="font-pixel text-base text-[#d97706]">+{Math.max(20, score)}</span>
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm pt-2">
-            <button
-              onClick={() => {
-                soundManager.playClick();
-                setQIndex(0);
-                setScore(0);
-                setCorrectCount(0);
-                setIsGameOver(false);
-                resetQuestionInputs();
-              }}
-              className="pixel-btn-blue flex-1 py-2.5 font-bold text-xs cursor-pointer"
-            >
-              Retry Mission
-            </button>
-
-            <button
-              onClick={() => {
-                soundManager.playClick();
-                handleFinishAndSave();
-              }}
-              className="pixel-btn-gold flex-1 py-2.5 font-bold text-xs cursor-pointer"
-            >
-              Save & Return
-            </button>
-          </div>
         </div>
-      )}
+      </div>
+
+      {/* Main Question Body */}
+      <div className="pixel-wood-box p-4 sm:p-6 shadow-md min-h-[320px]">
+        {renderSectionBody()}
+      </div>
+
+      {/* Bottom Action Footer */}
+      <div className="pixel-wood-box p-3.5 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleJumpToPrevSection}
+            disabled={currentSectionIndex === 0}
+            className={`px-3 py-1.5 text-xs font-pixel border cursor-pointer ${
+              currentSectionIndex === 0
+                ? 'bg-stone-300 text-stone-500 border-stone-400 opacity-50 cursor-not-allowed'
+                : 'pixel-btn-blue'
+            }`}
+          >
+            ⬅ Previous Level
+          </button>
+
+          <button
+            onClick={handleJumpToNextSection}
+            className="pixel-btn-gold px-3 py-1.5 text-xs font-pixel flex items-center gap-1 cursor-pointer"
+          >
+            <span>Skip / Next Level ➔</span>
+          </button>
+        </div>
+
+        {/* Submit or Next Question Action */}
+        <div className="flex items-center gap-2">
+          {!isSubmitted ? (
+            <button
+              onClick={() => handleSubmitCurrentAnswer()}
+              disabled={!hasProvidedInput()}
+              className={`px-5 py-2 font-pixel text-xs sm:text-sm transition-all cursor-pointer ${
+                hasProvidedInput()
+                  ? 'pixel-btn-green'
+                  : 'bg-stone-300 text-stone-500 border-2 border-stone-400 opacity-60 cursor-not-allowed'
+              }`}
+            >
+              Check Answer ✓
+            </button>
+          ) : (
+            <button
+              onClick={handleNextQuestion}
+              className="pixel-btn-green px-6 py-2.5 font-pixel text-xs sm:text-sm cursor-pointer shadow-lg animate-bounce"
+            >
+              {qIndex + 1 < totalQuestions ? 'Next Question ➔' : 'Complete Quest 🏆'}
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,98 +1,115 @@
 import React from 'react';
-import { SECTION_I_DATA } from '../../data/gameData';
+import { SECTION_I_DATA, FoodReviewItem } from '../../data/gameData';
 import { PixelSprite } from '../common/PixelSprite';
 
 interface SectionIViewProps {
-  questionIndex: number;
-  typedTranslation: string;
+  questionIndex: number; // 0 to 4
+  answer: string;
   onChange: (val: string) => void;
   submitted: boolean;
-  isCorrect?: boolean | null;
   playerTheme?: 'blue' | 'green';
 }
 
 export const SectionIView: React.FC<SectionIViewProps> = ({
   questionIndex,
-  typedTranslation,
+  answer,
   onChange,
   submitted,
-  isCorrect,
   playerTheme = 'blue',
 }) => {
-  const item = SECTION_I_DATA[questionIndex];
+  const currentQ: FoodReviewItem = SECTION_I_DATA[questionIndex] || SECTION_I_DATA[0];
+  const isCorrect = currentQ.acceptedAnswers.some(
+    (ans) => ans.toLowerCase() === (answer || '').trim().toLowerCase()
+  );
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* Source Language Card */}
-      <div className="pixel-parchment p-3 sm:p-5">
-        <div className="flex items-center justify-between mb-1">
-          <span className="font-pixel text-[9px] text-[#8b5a2b] uppercase">
-            Scroll {questionIndex + 1} of {SECTION_I_DATA.length} (
-            {item.type === 'EN_TO_ZH' ? 'English → Traditional Chinese' : 'Traditional Chinese → English'})
-          </span>
-          <span className="text-[11px] font-semibold text-[#854d0e] bg-[#faeed1] px-2 py-0.5 border border-[#8b5a2b]">
-            {item.type === 'EN_TO_ZH' ? 'EN → 中文' : '中文 → EN'}
-          </span>
+    <div className="flex flex-col gap-4">
+      {/* Restaurant Review Card */}
+      <div className="pixel-parchment p-4 sm:p-5 flex flex-col sm:flex-row items-center gap-4">
+        <div className="w-16 h-16 bg-[#e0f2fe] border-3 border-[#0284c7] flex items-center justify-center shrink-0 shadow">
+          <PixelSprite name={currentQ.spriteName} size={42} animate={submitted && isCorrect} />
         </div>
 
-        <p className="text-sm sm:text-lg font-bold text-[#381a00] leading-snug mt-1">
-          "{item.prompt}"
-        </p>
+        <div className="flex-1 w-full">
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-pixel text-[10px] text-[#8b5a2b] uppercase">
+              Review {questionIndex + 1} of {SECTION_I_DATA.length}
+            </span>
+            <span className="text-xs text-[#1e40af] font-semibold">
+              Word in brackets: <span className="font-bold underline">({currentQ.baseWord})</span>
+            </span>
+          </div>
+
+          <div className="text-base sm:text-lg font-bold text-[#2b1807] leading-relaxed">
+            {currentQ.sentenceBefore}{' '}
+            <span className="inline-block relative min-w-[140px]">
+              <input
+                type="text"
+                disabled={submitted}
+                placeholder={`Form of "${currentQ.baseWord}"...`}
+                value={answer}
+                onChange={(e) => onChange(e.target.value)}
+                className={`px-3 py-1 text-sm sm:text-base font-bold text-center border-b-3 focus:outline-none w-full ${
+                  submitted
+                    ? isCorrect
+                      ? 'bg-[#dcfce7] border-[#16a34a] text-[#166534]'
+                      : 'bg-[#fee2e2] border-[#dc2626] text-[#991b1b]'
+                    : 'bg-white border-[#b45309] text-[#1e3a8a] focus:border-[#2563eb]'
+                }`}
+                autoComplete="off"
+                spellCheck="false"
+              />
+            </span>{' '}
+            {currentQ.sentenceAfter}
+          </div>
+
+          {submitted && (
+            <div className="mt-3 flex items-center gap-2">
+              <PixelSprite name={isCorrect ? 'check' : 'cross'} size={18} />
+              <span
+                className={`text-xs font-bold ${
+                  isCorrect ? 'text-[#16a34a]' : 'text-[#dc2626]'
+                }`}
+              >
+                {isCorrect
+                  ? 'Correct form!'
+                  : `Answer: ${currentQ.correctWord}`}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Typing box */}
-      <div className="flex flex-col gap-1.5">
-        <label className="font-pixel text-[9px] text-[#78350f] uppercase">
-          {item.type === 'EN_TO_ZH'
-            ? 'Type your Traditional Chinese translation (繁體中文):'
-            : 'Type your English translation:'}
-        </label>
-        <textarea
-          rows={2}
-          disabled={submitted}
-          value={typedTranslation}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={
-            item.type === 'EN_TO_ZH'
-              ? '例如：那個戴眼鏡的男生是誰？'
-              : 'e.g. Who is the boy in the black suit?'
-          }
-          className={`w-full px-3 py-2 text-sm sm:text-base border-2 font-medium outline-hidden transition-all resize-none ${
-            playerTheme === 'blue'
-              ? 'focus:border-[#2563eb] focus:bg-[#eff6ff]'
-              : 'focus:border-[#16a34a] focus:bg-[#f0fdf4]'
-          } ${
-            submitted
-              ? isCorrect
-                ? 'bg-[#dcfce7] border-[#16a34a] text-[#14532d]'
-                : 'bg-[#fee2e2] border-[#dc2626] text-[#991b1b]'
-              : 'bg-white border-[#8b5a2b] text-[#2b2b2b]'
-          }`}
-        />
-      </div>
-
-      {/* Feedback & Model translation */}
-      {submitted && (
-        <div
-          className={`p-3 border-2 text-xs flex flex-col gap-1.5 ${
-            isCorrect
-              ? 'bg-[#dcfce7] border-[#16a34a] text-[#14532d]'
-              : 'bg-[#fff1f2] border-[#e11d48] text-[#881337]'
-          }`}
-        >
-          <div className="font-bold flex items-center gap-1.5">
-            <PixelSprite name={isCorrect ? 'check' : 'cross'} size={14} />
-            <span>{isCorrect ? 'Accurate translation!' : 'Good effort!'}</span>
+      {/* Overview Table of the 3 Restaurants */}
+      <div className="pixel-parchment p-3">
+        <h3 className="font-pixel text-[10px] sm:text-xs text-[#5c3708] mb-2 flex items-center gap-1.5">
+          <PixelSprite name="scroll" size={16} />
+          <span>Valley Restaurant Review Guide</span>
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+          <div className="p-2.5 bg-white border border-[#d6ba89] flex items-center gap-2">
+            <PixelSprite name="burger" size={24} />
+            <div>
+              <p className="font-bold text-[#451a03]">Burger House</p>
+              <p className="text-[11px] text-[#78350f]">Cheapest food & most popular spot</p>
+            </div>
           </div>
-          <div>
-            <span className="font-semibold">Suggested Translation: </span>
-            <span className="font-bold italic text-sm">"{item.modelAnswer}"</span>
+          <div className="p-2.5 bg-white border border-[#d6ba89] flex items-center gap-2">
+            <PixelSprite name="salad" size={24} />
+            <div>
+              <p className="font-bold text-[#451a03]">Green Salad Bar</p>
+              <p className="text-[11px] text-[#78350f]">Healthier meal choices than burgers</p>
+            </div>
           </div>
-          <div className="text-[11px] opacity-90 mt-0.5">
-            Key points: {item.explanation}
+          <div className="p-2.5 bg-white border border-[#d6ba89] flex items-center gap-2">
+            <PixelSprite name="steak" size={24} />
+            <div>
+              <p className="font-bold text-[#451a03]">Burger Town</p>
+              <p className="text-[11px] text-[#78350f]">Most expensive gourmet dining</p>
+            </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };

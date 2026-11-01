@@ -1,4 +1,4 @@
-export type SectionId = 'A' | 'B' | 'D' | 'E' | 'G' | 'H' | 'I' | 'K';
+export type SectionId = 'A' | 'B' | 'E' | 'F' | 'G' | 'H' | 'I' | 'K';
 
 export type GameMode = 'single' | 'twoplayer';
 
@@ -14,11 +14,6 @@ export interface LevelInfo {
     role: string;
     avatarType: 'mayor' | 'craftsman' | 'forest_nymph' | 'fashion_rabbit' | 'farmer' | 'miner' | 'librarian' | 'foxes';
     greeting: string;
-  };
-  grammarTip?: {
-    title: string;
-    rule: string;
-    example: string;
   };
   totalQuestions: number;
 }
@@ -41,7 +36,7 @@ export interface FarmDecoration {
   cost: number;
   starRequirement: number;
   description: string;
-  pixelSvg: string; // Identifier for pixel art SVG renderer
+  pixelSvg: string;
 }
 
 export interface UserSavedData {
